@@ -76,14 +76,13 @@ export const useBuscarClima = () => {
     setDadosClima(null); //limpa
 
     try {
-      const response = await geoCodeApi.get<{ result?: ResultadoBuscaLocal[] }>(
-        "/search",
-        {
-          params: { name: nomeCidade, count: 10, language: "pt" },
-        },
-      );
+      const response = await geoCodeApi.get<{
+        results?: ResultadoBuscaLocal[];
+      }>("/search", {
+        params: { name: nomeCidade, count: 10, language: "pt" },
+      });
 
-      setLocaisEncontrados(response.data.result || []);
+      setLocaisEncontrados(response.data.results || []);
     } catch (error) {
       console.error(error);
       setErro(
@@ -104,7 +103,7 @@ export const useBuscarClima = () => {
     const params = {
       latitude,
       longitude,
-      forecast_day: 1,
+      forecast_days: 1,
       hourly: [
         "temperature_2m",
         "rain",
@@ -121,7 +120,8 @@ export const useBuscarClima = () => {
         "relative_humidity_2m",
         "dew_point_2m",
         "apparent_temperature",
-      ],
+      ].join(","),
+
       minutely_15: [
         "temperature_2m",
         "relative_humidity_2m",
@@ -132,7 +132,7 @@ export const useBuscarClima = () => {
         "precipitation",
         "rain",
         "dew_point_2m",
-      ],
+      ].join(","),
     };
 
     try {
@@ -142,7 +142,7 @@ export const useBuscarClima = () => {
       setDadosClima(response.data);
     } catch (error) {
       console.error(
-        "Error! Não foim possível carregar os dados do clime. => erro em buscarClimaPorCoodenadas",
+        "Error! Não fom possível carregar os dados do clime. => erro em buscarClimaPorCoodenadas",
       );
     } finally {
       setLoading(false);
@@ -156,5 +156,63 @@ export const useBuscarClima = () => {
     erro, // -> Mensagem de erro informando o local
     buscarCidade, // -> método para buscar cidade pelo nome
     buscarClimaPorCoodenadas, // buscarClimaPorCoodenadas(latitude, longitude)-> busca dados climaticos passando latitude e longitude
+  };
+};
+
+export const useBuscarClimaCidade = () => {
+  const [loading, setLoading] = useState(false);
+  const [climaLocal, setClimaLocal] = useState<any>(null);
+
+  const buscarClimaLocal = async (lat: number, lon: number) => {
+    setLoading(true);
+    try {
+      const response = await openMeteoApi.get("/forecast", {
+        params: {
+          latitude: lat,
+          longitude: lon,
+          forecast_days: 1,
+          hourly: [
+            "temperature_2m",
+            "rain",
+            "cloud_cover",
+            "cloud_cover_low",
+            "cloud_cover_mid",
+            "cloud_cover_high",
+            "wind_speed_10m",
+            "snowfall",
+            "precipitation",
+            "precipitation_probability",
+            "wind_direction_10m",
+            "soil_temperature_6cm",
+            "relative_humidity_2m",
+            "dew_point_2m",
+            "apparent_temperature",
+          ].join(","),
+
+          minutely_15: [
+            "temperature_2m",
+            "relative_humidity_2m",
+            "wind_speed_10m",
+            "wind_gusts_10m",
+            "is_day",
+            "apparent_temperature",
+            "precipitation",
+            "rain",
+            "dew_point_2m",
+          ].join(","),
+        },
+      });
+      setClimaLocal(response.data);
+    } catch (error) {
+      console.error("Erro ao buscar clima da cidade infordado:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return {
+    climaLocal,
+    loading,
+    buscarClimaLocal,
   };
 };
