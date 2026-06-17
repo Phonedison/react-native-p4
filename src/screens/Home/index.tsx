@@ -1,9 +1,16 @@
 import React, { useState } from "react";
-import { Image, Text, TouchableOpacity, View } from "react-native";
+import { FlatList, Image, Text, TouchableOpacity, View } from "react-native";
 import { styles } from "./styles";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import iconeAlerta from "../../../assets/Siren.png";
-import { ListaFavoritos } from "../../components/ListaFavoritos";
+import { LocalFavorito } from "../../components/LocalFavorito";
+import { Favorito } from "../../components/LocalFavorito";
+
+const favoritos = [
+  { id: "1", longitude: "111", altitude: "111" },
+  { id: "2", longitude: "111", altitude: "111" },
+  { id: "3", longitude: "111", altitude: "111" },
+];
 
 export const Home = () => {
   const [notificacao, setNotificacao] = useState(true);
@@ -54,7 +61,12 @@ export const Home = () => {
           </View>
         </TouchableOpacity>
 
-        <ListaFavoritos />
+        {/* <FlatList<Favorito>
+        data={favoritos}
+        keyExtractor={(local) => local.id}
+        renderItem={({  }) => <LocalFavorito local={} />}
+        ListEmptyComponent={<Text>Ainda não existem locais favoritos</Text>}
+        /> */}
 
         {/* Estilização dos elementos renderizados -> lista de locais salvos */}
       </SafeAreaView>
