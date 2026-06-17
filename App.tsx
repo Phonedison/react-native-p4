@@ -1,14 +1,14 @@
-import { StatusBar } from "expo-status-bar";
-import { View } from "react-native";
-import { Home } from "./src/screens/Home";
-import { styles } from "./src/screens/Home/styles";
-import { Search } from "./src/screens/Search";
-
+import "react-native-gesture-handler";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { SafeAreaProvider } from "react-native-safe-area-context";
+import { Routes } from "./src/utils/routes";
 
 export default function App() {
   return (
-    <View style={styles.container}>
-      <Home/>
-    </View>
+    <GestureHandlerRootView>
+      <SafeAreaProvider>
+        <Routes />
+      </SafeAreaProvider>
+    </GestureHandlerRootView>
   );
 }
