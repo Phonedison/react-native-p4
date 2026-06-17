@@ -4,7 +4,7 @@ import { styles } from "./styles";
 export type Favorito = {
   id: string;
   longitude: string;
-  altitude: string;
+  latitude: string;
 };
 
 type FavoritoProps = {
@@ -17,7 +17,7 @@ export function LocalFavorito({ local, removeFavorito }: FavoritoProps) {
     <TouchableOpacity style={styles.card} activeOpacity={0.85}>
       <View style={styles.conteudo}>
         <Text style={styles.cidadeTexto}>{local.longitude}</Text>
-        <Text style={styles.tempTexto}>{local.altitude}</Text>
+        <Text style={styles.tempTexto}>{local.latitude}</Text>
       </View>
       <TouchableOpacity
         onPress={() => removeFavorito(local.id)}

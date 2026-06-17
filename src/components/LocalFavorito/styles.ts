@@ -28,8 +28,8 @@ export const styles = StyleSheet.create({
   },
   cidadeTexto: {
     color: whiteColor,
-    fontWeight: "600", 
-    fontSize: 16
+    fontWeight: "600",
+    fontSize: 16,
   },
   tempTexto: {
     fontSize: 30,

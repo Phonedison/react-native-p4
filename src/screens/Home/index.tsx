@@ -7,21 +7,23 @@ import { LocalFavorito } from "../../components/LocalFavorito";
 import { Favorito } from "../../components/LocalFavorito";
 
 const favoritos = [
-  { id: "1", longitude: "111", altitude: "111" },
-  { id: "2", longitude: "222", altitude: "222" },
-  { id: "3", longitude: "333", altitude: "333" },
-  { id: "4", longitude: "444", altitude: "444" },
-  { id: "5", longitude: "555", altitude: "555" },
-  { id: "6", longitude: "666", altitude: "666" },
+  { id: "1", longitude: "111", latitude: "111" },
+  { id: "2", longitude: "222", latitude: "222" },
+  { id: "3", longitude: "333", latitude: "333" },
+  { id: "4", longitude: "444", latitude: "444" },
+  { id: "5", longitude: "555", latitude: "555" },
+  { id: "6", longitude: "666", latitude: "666" },
 ];
 
 export const Home = () => {
   const [notificacao, setNotificacao] = useState(true);
   const [favorito, setFavorito] = useState<Favorito[]>(favoritos);
 
-function removeFavorito(id: string) {
-    const novaListaFavorito = favorito.filter(favorito => favorito.id != id)
-    setFavorito(novaListaFavorito)
+  function listarFavoritos() {}
+
+  function removeFavorito(id: string) {
+    const novaListaFavorito = favorito.filter((favorito) => favorito.id != id);
+    setFavorito(novaListaFavorito);
   }
 
   return (
@@ -73,8 +75,14 @@ function removeFavorito(id: string) {
         <FlatList<Favorito>
           data={favorito}
           keyExtractor={(local) => local.id}
-          renderItem={({ item }) => <LocalFavorito local={ item } removeFavorito={removeFavorito}/>}
-          ListEmptyComponent={<Text style={[styles.local, styles.text]}>Ainda não existem locais favoritos.</Text>}
+          renderItem={({ item }) => (
+            <LocalFavorito local={item} removeFavorito={removeFavorito} />
+          )}
+          ListEmptyComponent={
+            <Text style={[styles.local, styles.text]}>
+              Ainda não existem locais favoritos.
+            </Text>
+          }
           contentContainerStyle={{ gap: 16, width: "100%" }}
         />
 
