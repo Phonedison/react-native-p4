@@ -8,7 +8,7 @@ import { Search } from "./src/screens/Search";
 export default function App() {
   return (
     <View style={styles.container}>
-      <Search />
+      <Home/>
     </View>
   );
 }

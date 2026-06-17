@@ -1,17 +1,13 @@
-import React, { useState  } from "react";
-import { Image, Text, TouchableOpacity, View, TextInput, ActivityIndicator } from "react-native";
+import React, { useState } from "react";
+import { Image, Text, TouchableOpacity, View, TextInput} from "react-native";
 import { styles } from "./styles";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import iconeAlerta from "../../../assets/Siren.png";
-
-
 
 export const Search = () => {
   const [notificacao, setNotificacao] = useState(true);
   const [search, setSearch] = useState("");
  
-  
-  
 return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.container} edges={["left", "right", "top"]}>
@@ -29,8 +25,7 @@ return (
     )}
   </TouchableOpacity>
 </View>
-      
-        <View  style={styles.searchWrapper}>
+      <View  style={styles.searchWrapper}>
         <TextInput
           style={styles.searchInput}
           placeholder="Pesquisar cidade..."
@@ -39,14 +34,14 @@ return (
           onChangeText={setSearch}
           autoCorrect={false}
          />
-        
-        
        </View>
-      
-      
-        
        </SafeAreaView>
     </SafeAreaProvider>
-  );
-};
+      );
+    };
+        
+        
+      
+      
+        
 
