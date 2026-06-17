@@ -1,34 +1,32 @@
+import { useNavigation } from "@react-navigation/native";
+import { StackNavigationProp } from "@react-navigation/stack";
 import React, { useState } from "react";
-import { FlatList, Image, Text, TouchableOpacity, View } from "react-native";
-import { styles } from "./styles";
+import { Image, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-import iconeAlerta from "../../../assets/Siren.png";
-import { LocalFavorito } from "../../components/LocalFavorito";
-import { Favorito } from "../../components/LocalFavorito";
+import { RootStackParamList } from "../../utils/routes";
+import { styles } from "./styles";
+// const favoritos = [
+//   { id: "1", longitude: "111", altitude: "111" },
+//   { id: "2", longitude: "111", altitude: "111" },
+//   { id: "3", longitude: "111", altitude: "111" },
+// ];
 
-const favoritos = [
-  { id: "1", longitude: "111", altitude: "111" },
-  { id: "2", longitude: "111", altitude: "111" },
-  { id: "3", longitude: "111", altitude: "111" },
-];
+type SearchScreenNavigationProp = StackNavigationProp<
+  RootStackParamList,
+  "SearchPage"
+>;
 
-export const Home = () => {
+export const HomeScreen = () => {
+  const navigation = useNavigation<SearchScreenNavigationProp>();
   const [notificacao, setNotificacao] = useState(true);
 
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.container} edges={["left", "right", "top"]}>
-        <TouchableOpacity style={styles.notification} activeOpacity={0.8}>
-          {notificacao && (
-            <View style={styles.iconeContainer}>
-              <Image source={iconeAlerta} />
-            </View>
-          )}
-        </TouchableOpacity>
-
         <TouchableOpacity
           style={[styles.card, styles.cardPrincipal]}
           activeOpacity={0.85}
+          onPress={() => navigation.navigate("SearchPage")} //teste
         >
           <View style={styles.containerCard}>
             <Text style={[styles.text, styles.description]}>
