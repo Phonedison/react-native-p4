@@ -1,9 +1,14 @@
+import { StatusBar } from "expo-status-bar";
+import { View } from "react-native";
+import { Home } from "./src/screens/Home";
+import { styles } from "./src/screens/Home/styles";
+import { Search } from "./src/screens/Search";
 
-
-import SearchScreen from './src/screen/searchScreen';
 
 export default function App() {
-  return <SearchScreen />;
+  return (
+    <View style={styles.container}>
+      <Search />
+    </View>
+  );
 }
-
-
