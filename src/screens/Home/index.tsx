@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from "react";
+import { useNavigation } from "@react-navigation/native";
+import { StackNavigationProp } from "@react-navigation/stack";
+import React, { useState } from "react";
 import { FlatList, Image, Text, TouchableOpacity, View } from "react-native";
-import { styles } from "./styles";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-import iconeAlerta from "../../../assets/Siren.png";
-import { LocalFavorito } from "../../components/LocalFavorito";
-import { Favorito } from "../../components/LocalFavorito";
+import { Favorito, LocalFavorito } from "../../components/LocalFavorito";
+import { RootStackParamList } from "../../utils/routes";
+import { styles } from "./styles";
 
 const favoritos = [
   { id: "1", longitude: "111", latitude: "111" },
@@ -15,7 +16,13 @@ const favoritos = [
   { id: "6", longitude: "666", latitude: "666" },
 ];
 
-export const Home = () => {
+type SearchScreenNavigationProp = StackNavigationProp<
+  RootStackParamList,
+  "SearchPage"
+>;
+
+export const HomeScreen = () => {
+  const navigation = useNavigation<SearchScreenNavigationProp>();
   const [notificacao, setNotificacao] = useState(true);
   const [favorito, setFavorito] = useState<Favorito[]>(favoritos);
 
@@ -29,17 +36,10 @@ export const Home = () => {
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.container} edges={["left", "right", "top"]}>
-        <TouchableOpacity style={styles.notification} activeOpacity={0.8}>
-          {notificacao && (
-            <View style={styles.iconeContainer}>
-              <Image source={iconeAlerta} />
-            </View>
-          )}
-        </TouchableOpacity>
-
         <TouchableOpacity
           style={[styles.card, styles.cardPrincipal]}
           activeOpacity={0.85}
+          onPress={() => navigation.navigate("SearchPage")} //teste
         >
           <View style={styles.containerCard}>
             <Text style={[styles.text, styles.description]}>
