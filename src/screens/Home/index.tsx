@@ -2,6 +2,7 @@ import React from "react";
 import { View, Image, Text, TouchableOpacity } from "react-native";
 import { styles } from "./styles";
 import iconeAlerta from "../../../assets/Siren.png";
+import { ListaFavoritos } from "../../components/ListaFavoritos";
 
 export const Home = () => {
   return (
@@ -31,6 +32,8 @@ export const Home = () => {
           <Text></Text>
         </TouchableOpacity>
       </View>
+
+      <ListaFavoritos />
     </View>
   );
 };
