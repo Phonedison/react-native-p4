@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { geoCodeApi, openMeteoApi } from "../services/OpenMeteoApi";
+import { geoCodeApi, openMeteoApi } from "../services/API";
 
 export type ResultadoBuscaLocal = {
   id: number; //id da cidade/local
