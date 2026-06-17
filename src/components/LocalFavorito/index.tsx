@@ -7,18 +7,17 @@ export type Favorito = {
   altitude: string;
 }
 
-export type FavoritoProps = {
+type FavoritoProps = {
   local: Favorito;
 }
 
-export function LocalFavorito ({ local }: FavoritoProps) {
-  
+export function LocalFavorito({ local }: FavoritoProps) {  
 
   return (
     <TouchableOpacity style={styles.card} activeOpacity={0.85}>
       <View style={styles.conteudo}>
-        <Text style={styles.cidadeTexto}>local.longitude</Text>
-        <Text style={styles.tempTexto}>local.altitude</Text>
+        <Text style={styles.cidadeTexto}>{local.longitude}</Text>
+        <Text style={styles.tempTexto}>{local.altitude}</Text>
       </View>
       <TouchableOpacity activeOpacity={0.8} style={styles.botaoRemover}>
         <Text style={styles.botaoRemoverTexto}>X</Text>
