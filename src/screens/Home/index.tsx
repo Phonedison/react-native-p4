@@ -4,10 +4,10 @@ import React, { useCallback, useState } from "react";
 import { FlatList, Image, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { Favorito, LocalFavorito } from "../../components/LocalFavorito";
-import { RootStackParamList } from "../../utils/routes";
+import { RootStackParamList } from "../../components/Navigators/Stack";
+import { openMeteoApi } from "../../services/API";
 import { styles } from "./styles";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { openMeteoApi } from "../../services/API";
 
 const locaisFavoritos = [{}];
 
