@@ -62,12 +62,7 @@ export const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
 
-  text: { letterSpacing: 0.3, textAlign: "center", color: whiteColor },
-
-  local: { fontWeight: "600", fontSize: 16 },
-  description: { opacity: 0.9, fontWeight: "200", fontSize: 13 },
   temperature: { fontWeight: "900", fontSize: 90 },
-  subInfoText: { fontWeight: "600", fontSize: 16 },
   observation: { fontWeight: "400", fontSize: 13 },
 
   iconTemperature: { width: 80, height: 80 },
@@ -87,75 +82,4 @@ export const styles = StyleSheet.create({
     gap: 8,
   },
 
-  searchWrapper: {
-    flexDirection: "row",
-    alignItems: "center",
-    borderRadius: 20,
-    paddingHorizontal: 14,
-    marginBottom: 16,
-    overflow: "hidden",
-    borderWidth: 1,
-    borderColor: cardBorderColor,
-  },
-
-  searchInput: {
-    flex: 1,
-    color: whiteColor,
-    fontSize: 15,
-  },
-  emptyText: {
-    color: cardBorderColor,
-    textAlign: "center",
-    marginTop: 24,
-    fontSize: 14,
-  },
-
-  checkWrapper: {
-    width: 34,
-    height: 34,
-    borderRadius: 10,
-    backgroundColor: "rgba(255,255,255,0.2)",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  checkWrapperSelected: {
-    backgroundColor: "#2ecc71",
-  },
-  checkIcon: {
-    color: backgroundColor,
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-
-  resultItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    backgroundColor: "rgba(255,255,255,0.15)",
-    borderRadius: 14,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    marginBottom: 10,
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.2)",
-    minHeight: 56,
-    alignSelf: "stretch",
-  },
-  resultItemSelected: {
-    backgroundColor: "rgba(255,255,255,0.22)",
-    borderColor: "rgba(255,255,255,0.45)",
-  },
-  resultTextWrapper: {
-    flex: 1,
-  },
-  resultName: {
-    color: whiteColor,
-    fontSize: 15,
-    fontWeight: "600",
-  },
-  resultSub: {
-    color: "rgba(255,255,255,0.75)",
-    fontSize: 12,
-    marginTop: 2,
-  },
 });
