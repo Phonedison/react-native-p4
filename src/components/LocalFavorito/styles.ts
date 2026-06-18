@@ -1,13 +1,10 @@
 import { StyleSheet } from "react-native";
-
-const whiteColor: string = "#fff";
-
-const cardBorderColor: string = "rgba(217, 217, 217, 0.55)";
-const backgroundColor: string = "rgb(5, 102, 141)";
-
-const cardAlertBackgroundColor: string = "rgba(204, 88, 3,0.8)";
-const cardBackgroundColor: string = "rgba(217, 217, 217, 0.13)";
-
+import {
+  cardBackgroundColor,
+  cardBorderColor,
+  cardRemoveBackgroundColor,
+  whiteColor,
+} from "../../utils/globalStyles";
 export const styles = StyleSheet.create({
   /* estilização padrão dos cards */
   card: {
@@ -38,7 +35,7 @@ export const styles = StyleSheet.create({
   },
   botaoRemover: {
     padding: 16,
-    backgroundColor: "#ff0800",
+    backgroundColor: cardRemoveBackgroundColor,
     width: 60,
     height: "100%",
     borderTopRightRadius: 15,
