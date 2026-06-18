@@ -177,7 +177,7 @@ export const useBuscarClima = () => {
     buscarCidade, // -> método para buscar cidade pelo nome
     buscarClimaPorCoodenadas, // buscarClimaPorCoodenadas(latitude, longitude)-> busca dados climaticos passando latitude e longitude
     limparResultados, // Método para limpar os resultados da tela de pesquisa quando o usuário excluir o que digitou
-    buscarTemperatura // Método para buscar a temperatura especifica da cidade no momento sem precisar da coordenada
+    buscarTemperatura // Método para buscar a temperatura especifica da cidade sem sobreescrever
   };
 };
 
