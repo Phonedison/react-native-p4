@@ -1,3 +1,4 @@
+import * as Location from "expo-location";
 import { useState } from "react";
 import { geoCodeApi, openMeteoApi } from "../services/API";
 
@@ -11,6 +12,7 @@ export type ResultadoBuscaLocal = {
 };
 
 export type DadosClima = {
+  nomeCidade?: string;
   latitude: number;
   longitude: number;
   generationtime_ms: number; // Tempo do servidor resposta
@@ -56,6 +58,11 @@ export type DadosClima = {
   };
 };
 
+export type Coordenadas = {
+  latitude: number;
+  longitude: number;
+};
+
 export const useBuscarClima = () => {
   const [locaisEncontrados, setLocaisEncontrados] = useState<
     ResultadoBuscaLocal[]
@@ -96,6 +103,7 @@ export const useBuscarClima = () => {
   const buscarClimaPorCoodenadas = async (
     latitude: number,
     longitude: number,
+    nomeCidade?: string,
   ) => {
     setLoading(true);
     setErro(null);
@@ -139,7 +147,10 @@ export const useBuscarClima = () => {
       const response = await openMeteoApi.get<DadosClima>("/forecast", {
         params,
       });
-      setDadosClima(response.data);
+      setDadosClima({
+        ...response.data,
+        nomeCidade: nomeCidade || "Localização Atual",
+      });
     } catch (error) {
       console.error(
         "Error! Não fom possível carregar os dados do clime. => erro em buscarClimaPorCoodenadas",
@@ -149,26 +160,29 @@ export const useBuscarClima = () => {
     }
   };
 
- const buscarTemperatura = async (latitude: number, longitude: number): Promise<number | null> => {
-  try {
-    const response = await openMeteoApi.get<any>("/forecast", {
-      params: {
-        latitude,
-        longitude,
-        current: "temperature_2m", 
-      },
-    });
-    return response.data.current?.temperature_2m ?? null;
-  } catch {
-    return null;
-  }
-};
-  
-  const limparResultados = () => {
-  setLocaisEncontrados([]);
-  setErro(null);
+  const buscarTemperatura = async (
+    latitude: number,
+    longitude: number,
+  ): Promise<number | null> => {
+    try {
+      const response = await openMeteoApi.get<any>("/forecast", {
+        params: {
+          latitude,
+          longitude,
+          current: "temperature_2m",
+        },
+      });
+      return response.data.current?.temperature_2m ?? null;
+    } catch {
+      return null;
+    }
   };
-  
+
+  const limparResultados = () => {
+    setLocaisEncontrados([]);
+    setErro(null);
+  };
+
   return {
     locaisEncontrados, // -> lista de locais após a busca da cidade pelo nome
     dadosClima, // -> objeto com todos os dados meteorológicos da cidade selecionada
@@ -177,7 +191,7 @@ export const useBuscarClima = () => {
     buscarCidade, // -> método para buscar cidade pelo nome
     buscarClimaPorCoodenadas, // buscarClimaPorCoodenadas(latitude, longitude)-> busca dados climaticos passando latitude e longitude
     limparResultados, // Método para limpar os resultados da tela de pesquisa quando o usuário excluir o que digitou
-    buscarTemperatura // Método para buscar a temperatura especifica da cidade sem sobreescrever
+    buscarTemperatura, // Método para buscar a temperatura especifica da cidade sem sobreescrever
   };
 };
 
@@ -209,7 +223,7 @@ export const useBuscarClimaCidade = () => {
             "relative_humidity_2m",
             "dew_point_2m",
             "apparent_temperature",
-          ].join(","),
+          ],
 
           minutely_15: [
             "temperature_2m",
@@ -221,7 +235,7 @@ export const useBuscarClimaCidade = () => {
             "precipitation",
             "rain",
             "dew_point_2m",
-          ].join(","),
+          ],
         },
       });
       setClimaLocal(response.data);
@@ -237,4 +251,43 @@ export const useBuscarClimaCidade = () => {
     loading,
     buscarClimaLocal,
   };
+};
+
+export const useMyLocation = () => {
+  const [coordenadas, setCoordenadas] = useState<Coordenadas>();
+  const [erro, setErro] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const getCoordenadas = async (): Promise<Coordenadas | null> => {
+    setLoading(true);
+    setErro(null);
+
+    //pega a permissão do usuário
+    let { status } = await Location.requestForegroundPermissionsAsync();
+
+    //verifica a permissão
+    if (status !== "granted") {
+      setErro("Permissão de acesso à localização foi negada");
+      setLoading(false);
+      return null;
+    }
+
+    try {
+      const localizacao = await Location.getCurrentPositionAsync({});
+      const { latitude, longitude } = localizacao.coords;
+
+      const novasCoordenadas = { latitude, longitude };
+      setCoordenadas({ latitude, longitude });
+
+      return novasCoordenadas;
+    } catch (err) {
+      console.log(err);
+      alert("erro, Não foi possí9vel obter a localização atual.");
+      setErro("Erro");
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  };
+  return { coordenadas, erro, loading, getCoordenadas };
 };
