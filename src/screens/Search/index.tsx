@@ -7,6 +7,7 @@ import { StackNavigationProp } from "@react-navigation/stack";
 import { styles } from "./styles";
 import { useBuscarClima } from "../../hooks";
 import {RootStackParamList} from "../../utils/routes"
+import AsyncStorage from "@react-native-async-storage/async-storage"
 
 type NavigationProp = StackNavigationProp<RootStackParamList, "SearchPage">;
 
@@ -18,7 +19,6 @@ export const SearchScreen = () => {
 
   const { locaisEncontrados, loading, buscarCidade, limparResultados, buscarTemperatura } = useBuscarClima();
   
-
   useEffect(() => {
   if (locaisEncontrados.length === 0) {
     setTemperaturas({});
@@ -32,13 +32,47 @@ export const SearchScreen = () => {
 }, [locaisEncontrados]);
 
 
-  const handleFavoritar = (id: number) => {
-    setFavoritos(prev => {
-      const next = new Set(prev);
-      next.has(id) ? next.delete(id) : next.add(id);
-      return next;
-    });
-  };
+  const handleFavoritar = async (cidade: any) => {
+  setFavoritos(prev => {
+    const next = new Set(prev);
+
+    if (next.has(cidade.id)) {
+      next.delete(cidade.id);
+    } else {
+      next.add(cidade.id);
+      salvarFavorito(cidade);
+    }
+
+    return next;
+  });
+};
+
+  async function salvarFavorito(cidade: any) {
+    try {
+      const json = await AsyncStorage.getItem("@favoritos");
+      const favoritosSalvos = json ? JSON.parse(json) : [];
+
+      const jaExiste = favoritosSalvos.some(
+        (fav: any) => fav.id === String(cidade.id)
+      );
+
+      if (jaExiste) return;
+
+      favoritosSalvos.push({
+        id: String(cidade.id),
+        nomeCidade: `${cidade.name}, ${cidade.country}`,
+        latitude: String(cidade.latitude),
+        longitude: String(cidade.longitude),
+      });
+
+      await AsyncStorage.setItem(
+        "@favoritos",
+        JSON.stringify(favoritosSalvos)
+      );
+    } catch (error) {
+      console.error(error);
+    }
+  }
 
   const renderItem = ({ item }: { item: any }) => {
   const isFavorito = favoritos.has(item.id);
@@ -63,7 +97,7 @@ export const SearchScreen = () => {
       </View>
         
       <TouchableOpacity
-        onPress={() => handleFavoritar(item.id)}
+        onPress={() => handleFavoritar(item)}
         style={[styles.checkWrapper, isFavorito && styles.checkWrapperSelected]}
         hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
       >

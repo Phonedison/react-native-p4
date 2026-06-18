@@ -1,6 +1,6 @@
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 import { FlatList, Image, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { Favorito, LocalFavorito } from "../../components/LocalFavorito";
@@ -9,14 +9,7 @@ import { styles } from "./styles";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { openMeteoApi } from "../../services/API";
 
-const locaisFavoritos = [
-  { id: "1", nomeCidade: "Rio de Janeiro, BR", latitude: "-22.9068", longitude: "-43.1729" },
-  { id: "2", nomeCidade: "São Paulo, BR", latitude: "-23.5505", longitude: "-46.6333" },
-  { id: "3", nomeCidade: "Porto Alegre, BR", latitude: "-30.0346", longitude: "-51.2177" },
-  { id: "4", nomeCidade: "Fortaleza, BR", latitude: "-3.7172",  longitude: "-38.5433" },
-  { id: "5", nomeCidade: "Paris, França", latitude: "48.8566",  longitude: "2.3522"   },
-  { id: "6", nomeCidade: "Tóquio, Japão", latitude: "35.6762",  longitude: "139.6503" },
-];
+const locaisFavoritos = [{}];
 
 type SearchScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -25,71 +18,101 @@ type SearchScreenNavigationProp = StackNavigationProp<
 
 export const HomeScreen = () => {
   const navigation = useNavigation<SearchScreenNavigationProp>();
+
   const [notificacao, setNotificacao] = useState(true);
   const [favoritos, setFavoritos] = useState<Favorito[]>([]);
   const [carregando, setCarregando] = useState(true);
 
-  useEffect(() => {
-    async function carregarFavoritosComClima(): Promise<void> {
-      try {
-        
-        const json = await AsyncStorage.getItem("@favoritos");
-        const dados: Favorito[] = json ? JSON.parse(json) : locaisFavoritos;
+  const carregarFavoritosComClima = async () => {
+    try {
+      setCarregando(true);
 
-        const favoritosComClima = await Promise.all(
-          dados.map(async (favorito): Promise<Favorito> => {
-            try {
-              const resposta = await openMeteoApi.get("/forecast", {
-                params: {
-                  latitude: favorito.latitude,
-                  longitude: favorito.longitude,
-                  current: "temperature_2m",
-                  forecast_days: 1,
-                },
-              });
+      const json = await AsyncStorage.getItem("@favoritos");
 
-              const current = resposta.data?.current;
-              return {
-                ...favorito,
-                temperatura: current?.temperature_2m,
-              };
-            } catch {
-              return { ...favorito };
-            }
-          })
-        );
+      const dados: Favorito[] = json
+        ? JSON.parse(json)
+        : locaisFavoritos;
 
-        setFavoritos(favoritosComClima);
-      } catch (erro) {
-        console.error("Erro ao carregar favoritos:", erro);
-      } finally {
-        setCarregando(false);
-      }
+      const favoritosComClima = await Promise.all(
+        dados.map(async (favorito): Promise<Favorito> => {
+          try {
+            const resposta = await openMeteoApi.get("/forecast", {
+              params: {
+                latitude: favorito.latitude,
+                longitude: favorito.longitude,
+                current: "temperature_2m",
+                forecast_days: 1,
+              },
+            });
+
+            return {
+              ...favorito,
+              temperatura: resposta.data?.current?.temperature_2m,
+            };
+          } catch {
+            return favorito;
+          }
+        })
+      );
+
+      setFavoritos(favoritosComClima);
+    } catch (erro) {
+      console.error("Erro ao carregar favoritos:", erro);
+    } finally {
+      setCarregando(false);
     }
+  };
 
-    carregarFavoritosComClima();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      carregarFavoritosComClima();
+    }, [])
+  );
 
-  function removeFavorito(id: string) {
-    const novaListaFavorito = favoritos.filter((favoritos) => favoritos.id != id);
-    setFavoritos(novaListaFavorito);
+  async function removeFavorito(id: string) {
+    try {
+      const novaLista = favoritos.filter(
+        (favorito) => favorito.id !== id
+      );
+
+      setFavoritos(novaLista);
+
+      await AsyncStorage.setItem(
+        "@favoritos",
+        JSON.stringify(
+          novaLista.map(({ temperatura, ...rest }) => rest)
+        )
+      );
+    } catch (erro) {
+      console.error("Erro ao remover favorito:", erro);
+    }
   }
 
   return (
     <SafeAreaProvider>
-      <SafeAreaView style={styles.container} edges={["left", "right", "top"]}>
+      <SafeAreaView
+        style={styles.container}
+        edges={["left", "right", "top"]}
+      >
         <TouchableOpacity
           style={[styles.card, styles.cardPrincipal]}
           activeOpacity={0.85}
-          onPress={() => navigation.navigate("SearchPage")} //teste
+          onPress={() => navigation.navigate("SearchPage")}
         >
           <View style={styles.containerCard}>
             <Text style={[styles.text, styles.description]}>
               Minha Localização
             </Text>
-            <Text style={[styles.text, styles.local]}>Rio de Janeiro</Text>
+
+            <Text style={[styles.text, styles.local]}>
+              Rio de Janeiro
+            </Text>
+
             <View style={styles.infoContainer}>
-              <Text style={[styles.text, styles.temperature]}>20º</Text>
+              <Text style={[styles.text, styles.temperature]}>
+                20º
+              </Text>
+
               <Image
                 source={require("../../../assets/icons/iconCloud.png")}
                 style={styles.iconTemperature}
@@ -98,7 +121,10 @@ export const HomeScreen = () => {
             </View>
 
             <View style={styles.infoContainer}>
-              <Text style={[styles.text, styles.subInfoText]}>Nublado</Text>
+              <Text style={[styles.text, styles.subInfoText]}>
+                Nublado
+              </Text>
+
               <Image
                 source={require("../../../assets/icons/moonCloud.png")}
                 style={styles.iconSubInfo}
@@ -108,7 +134,7 @@ export const HomeScreen = () => {
 
             <View style={styles.infoContainer}>
               <Text style={[styles.text, styles.observation]}>
-                Dia 22ª - Noite 18ºC
+                Dia 22° - Noite 18°C
               </Text>
             </View>
           </View>
@@ -116,19 +142,25 @@ export const HomeScreen = () => {
 
         <FlatList<Favorito>
           data={favoritos}
-          keyExtractor={(local) => local.id}
+          keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
-            <LocalFavorito local={item} removeFavorito={removeFavorito} />
+            <LocalFavorito
+              local={item}
+              removeFavorito={removeFavorito}
+            />
           )}
           ListEmptyComponent={
-            <Text style={[styles.local, styles.text]}>
-              Ainda não existem locais favoritos.
-            </Text>
+            !carregando ? (
+              <Text style={[styles.local, styles.text]}>
+                Ainda não existem locais favoritos.
+              </Text>
+            ) : null
           }
-          contentContainerStyle={{ gap: 16, width: "100%" }}
+          contentContainerStyle={{
+            gap: 16,
+            width: "100%",
+          }}
         />
-
-        {/* Estilização dos elementos renderizados -> lista de locais salvos */}
       </SafeAreaView>
     </SafeAreaProvider>
   );
