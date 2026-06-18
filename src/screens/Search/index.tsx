@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from "react";
-import { TextInput, View, TouchableOpacity, Text, FlatList } from "react-native";
+import { TextInput, View, TouchableOpacity, Text, FlatList, ActivityIndicator } from "react-native";
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
@@ -30,6 +30,8 @@ export const SearchScreen = () => {
     setTemperaturas(prev => ({ ...prev, [cidade.id]: temp }));
   });
 }, [locaisEncontrados]);
+
+
   const handleFavoritar = (id: number) => {
     setFavoritos(prev => {
       const next = new Set(prev);
@@ -60,9 +62,6 @@ export const SearchScreen = () => {
 
       </View>
         
-
-      
-
       <TouchableOpacity
         onPress={() => handleFavoritar(item.id)}
         style={[styles.checkWrapper, isFavorito && styles.checkWrapperSelected]}
@@ -74,47 +73,57 @@ export const SearchScreen = () => {
   );
 };
 
-  return (
-    <SafeAreaProvider>
-      <SafeAreaView style={styles.container} edges={["left", "right", "top"]}>
+return (
+  <SafeAreaProvider>
+    <SafeAreaView style={styles.container} edges={["left", "right", "top"]}>
+      <View style={styles.searchWrapper}>
+
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Pesquisar cidade..."
+          placeholderTextColor="rgba(0, 0, 0, 0.6)"
+          value={search}
+          onChangeText={(text) => {
+            setSearch(text);
+            if (text.trim().length >= 3) {
+              buscarCidade(text);
+            } else {
+              limparResultados();
+            }
+          }}
+        />
+      </View>
+        
+     {loading && (
+      <ActivityIndicator size="large" color="#fff" style={{ marginTop: 20 }} />
+      )}
+
+    <FlatList
+        data={locaisEncontrados}
+        keyExtractor={(item) => String(item.id)}
+        renderItem={renderItem}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+        style={{ width: "100%" }}
+        ListEmptyComponent={
+          search.trim().length >= 3 && !loading
+            ? <Text style={styles.emptyText}>Nenhuma cidade encontrada.</Text>
+            : null
+        }
+      />
+    </SafeAreaView>
+  </SafeAreaProvider>
+);
+};
+
+      
+
 
         
 
-        <View style={styles.searchWrapper}>
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Pesquisar cidade..."
-            placeholderTextColor="rgba(0, 0, 0, 0.6)"
-            value={search}
-            onChangeText={(text) => {
-              setSearch(text);
-              if (text.trim().length >= 3) {
-                buscarCidade(text);
-              } else {
-                limparResultados();
-              }
-            }}
-          />
-        </View>
+          
+        
 
-        <FlatList
-          data={locaisEncontrados}
-          keyExtractor={(item) => String(item.id)}
-          renderItem={renderItem}
-          keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}
-          style={{ width: "100%" }}
-          ListEmptyComponent={
-            search.trim().length >= 3 && !loading
-              ? <Text style={styles.emptyText}>Nenhuma cidade encontrada.</Text>
-              : null
-          }
-        />
-
-      </SafeAreaView>
-    </SafeAreaProvider>
-  );
-};
         
       
       
