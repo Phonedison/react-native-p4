@@ -1,12 +1,17 @@
-import React, { useState, useEffect } from "react";
-import { Image, Text, TouchableOpacity, View, TextInput, FlatList } from "react-native";
+
+import React, { useState } from "react";
+import { TextInput, View, TouchableOpacity, Text, FlatList } from "react-native";
+import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
+import { useNavigation } from "@react-navigation/native";
+import { StackNavigationProp } from "@react-navigation/stack";
 import { styles } from "./styles";
-import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-import iconeAlerta from "../../../assets/Siren.png";
 import { useBuscarClima } from "../../hooks";
+import {RootStackParamList} from "../../utils/routes"
+
+type NavigationProp = StackNavigationProp<RootStackParamList, "SearchPage">;
 
 export const SearchScreen = () => {
-  const [notificacao, setNotificacao] = useState(true);
+  const navigation = useNavigation<NavigationProp>();
   const [search, setSearch] = useState("");
   const [favoritos, setFavoritos] = useState<Set<number>>(new Set());
 
@@ -19,7 +24,6 @@ export const SearchScreen = () => {
       return next;
     });
   };
-  
 
   const renderItem = ({ item }: { item: any }) => {
     const isFavorito = favoritos.has(item.id);
@@ -51,18 +55,7 @@ export const SearchScreen = () => {
     <SafeAreaProvider>
       <SafeAreaView style={styles.container} edges={["left", "right", "top"]}>
 
-        <View style={styles.header}>
-          <TouchableOpacity style={styles.backBtn}>
-            <Text style={styles.backArrow}>← <Text style={styles.backText}>Voltar</Text></Text>
-          </TouchableOpacity>
-          <TouchableOpacity activeOpacity={0.8}>
-            {notificacao && (
-              <View style={styles.iconeContainer}>
-                <Image source={iconeAlerta} />
-              </View>
-            )}
-          </TouchableOpacity>
-        </View>
+        
 
         <View style={styles.searchWrapper}>
           <TextInput
@@ -71,15 +64,14 @@ export const SearchScreen = () => {
             placeholderTextColor="rgba(26, 25, 25, 0.6)"
             value={search}
             onChangeText={(text) => {
-            setSearch(text);
-            if (text.trim().length >= 3) {
-            buscarCidade(text); 
-            } else {
-            limparResultados(); 
-            }
-           }}
+              setSearch(text);
+              if (text.trim().length >= 3) {
+                buscarCidade(text);
+              } else {
+                limparResultados();
+              }
+            }}
           />
-          
         </View>
 
         <FlatList
