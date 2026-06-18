@@ -11,9 +11,9 @@ import {
   View,
 } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
+import { RootStackParamList } from "../../../utils/routes";
 import { Favorito, LocalFavorito } from "../../components/LocalFavorito";
 import { useBuscarClima, useMyLocation } from "../../hooks";
-import { RootStackParamList } from "../../utils/routes";
 import { styles } from "./styles";
 
 const locaisFavoritos = [
@@ -62,6 +62,8 @@ type SearchScreenNavigationProp = StackNavigationProp<
 
 export const HomeScreen = () => {
   const navigation = useNavigation<SearchScreenNavigationProp>();
+  const [notificacao, setNotificacao] = useState(true);
+
   const [favoritos, setFavoritos] = useState<Favorito[]>(locaisFavoritos);
   const [cidadeGps, setCidadeGps] = useState<string | null>(null);
 
@@ -135,7 +137,9 @@ export const HomeScreen = () => {
   }
 
   function removeFavorito(id: string) {
-    const novaListaFavorito = favoritos.filter((fav) => fav.id !== id);
+    const novaListaFavorito = favoritos.filter(
+      (favoritos) => favoritos.id != id,
+    );
     setFavoritos(novaListaFavorito);
   }
 

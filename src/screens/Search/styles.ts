@@ -1,12 +1,10 @@
 import { StyleSheet } from "react-native";
-
-const whiteColor: string = "#fff";
-
-const cardBorderColor: string = "rgba(217, 217, 217, 0.55)";
-const backgroundColor: string = "rgb(5, 102, 141)";
-
-// const cardAlertBackgroundColor: string = "rgba(204, 88, 3,0.8)";
-const cardBackgroundColor: string = "rgba(217, 217, 217, 0.13)";
+import {
+  backgroundColor,
+  cardBackgroundColor,
+  cardBorderColor,
+  whiteColor,
+} from "../../utils/globalStyles";
 
 export const styles = StyleSheet.create({
   header: {
@@ -111,8 +109,8 @@ export const styles = StyleSheet.create({
     marginTop: 24,
     fontSize: 14,
   },
-  
-    checkWrapper: {
+
+  checkWrapper: {
     width: 34,
     height: 34,
     borderRadius: 10,
@@ -124,25 +122,25 @@ export const styles = StyleSheet.create({
     backgroundColor: "#2ecc71",
   },
   checkIcon: {
-    color: "#fff",
+    color: backgroundColor,
     fontSize: 16,
     fontWeight: "bold",
   },
- 
+
   resultItem: {
-  flexDirection: "row",
-  alignItems: "center",
-  justifyContent: "space-between",
-  backgroundColor: "rgba(255,255,255,0.15)",
-  borderRadius: 14,
-  paddingVertical: 12,
-  paddingHorizontal: 16,
-  marginBottom: 10,
-  borderWidth: 1,
-  borderColor: "rgba(255,255,255,0.2)",
-  minHeight: 56,
-  alignSelf: "stretch", 
-},
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    backgroundColor: "rgba(255,255,255,0.15)",
+    borderRadius: 14,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.2)",
+    minHeight: 56,
+    alignSelf: "stretch",
+  },
   resultItemSelected: {
     backgroundColor: "rgba(255,255,255,0.22)",
     borderColor: "rgba(255,255,255,0.45)",
@@ -151,15 +149,13 @@ export const styles = StyleSheet.create({
     flex: 1,
   },
   resultName: {
-  color: "#ffffff",
-  fontSize: 15,
-  fontWeight: "600",
-},
-resultSub: {
-  color: "rgba(255,255,255,0.75)",
-  fontSize: 12,
-  marginTop: 2,
-},
-
-
+    color: whiteColor,
+    fontSize: 15,
+    fontWeight: "600",
+  },
+  resultSub: {
+    color: "rgba(255,255,255,0.75)",
+    fontSize: 12,
+    marginTop: 2,
+  },
 });

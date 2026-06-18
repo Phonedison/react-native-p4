@@ -1,12 +1,11 @@
 import { StyleSheet } from "react-native";
-
-const whiteColor: string = "#fff";
-
-const cardBorderColor: string = "rgba(217, 217, 217, 0.55)";
-const backgroundColor: string = "rgb(5, 102, 141)";
-
-const cardAlertBackgroundColor: string = "rgba(204, 88, 3,0.8)";
-const cardBackgroundColor: string = "rgba(217, 217, 217, 0.13)";
+import {
+  backgroundColor,
+  cardAlertBackgroundColor,
+  cardBackgroundColor,
+  cardBorderColor,
+  whiteColor,
+} from "../../utils/globalStyles";
 
 export const styles = StyleSheet.create({
   container: {
