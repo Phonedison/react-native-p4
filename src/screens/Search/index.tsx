@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { TextInput, View, TouchableOpacity, Text, FlatList } from "react-native";
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
@@ -14,9 +14,22 @@ export const SearchScreen = () => {
   const navigation = useNavigation<NavigationProp>();
   const [search, setSearch] = useState("");
   const [favoritos, setFavoritos] = useState<Set<number>>(new Set());
+  const [temperaturas, setTemperaturas] = useState<Record<number, number | null>>({});
 
-  const { locaisEncontrados, loading, buscarCidade, limparResultados } = useBuscarClima();
+  const { locaisEncontrados, loading, buscarCidade, limparResultados, buscarTemperatura } = useBuscarClima();
+  
 
+  useEffect(() => {
+  if (locaisEncontrados.length === 0) {
+    setTemperaturas({});
+    return;
+  }
+
+  locaisEncontrados.forEach(async (cidade) => {
+    const temp = await buscarTemperatura(cidade.latitude, cidade.longitude);
+    setTemperaturas(prev => ({ ...prev, [cidade.id]: temp }));
+  });
+}, [locaisEncontrados]);
   const handleFavoritar = (id: number) => {
     setFavoritos(prev => {
       const next = new Set(prev);
@@ -26,30 +39,40 @@ export const SearchScreen = () => {
   };
 
   const renderItem = ({ item }: { item: any }) => {
-    const isFavorito = favoritos.has(item.id);
-    const subtitle = [item.admin1, item.country].filter(Boolean).join(", ");
+  const isFavorito = favoritos.has(item.id);
+  const subtitle = [item.admin1, item.country].filter(Boolean).join(", ");
+  const temperatura = temperaturas[item.id];
 
-    return (
+  return (
+    <TouchableOpacity
+      style={[styles.resultItem, isFavorito && styles.resultItemSelected]}
+      onPress={() => console.log("navegar para detalhes de", item.name)}
+      activeOpacity={0.85}
+    >
+      <View style={styles.resultTextWrapper}>
+      
+        <Text style={[styles.text, styles.local]}>{item.name} / <Text style={[styles.text, styles.subInfoText]}>
+        {temperatura !== undefined && temperatura !== null
+          ? `${(temperatura)}°`
+          : "..."}
+        </Text> </Text> 
+        {subtitle ? <Text style={[styles.text, styles.description]}>{subtitle}</Text> : null}
+
+      </View>
+        
+
+      
+
       <TouchableOpacity
-        style={[styles.resultItem, isFavorito && styles.resultItemSelected]}
-        onPress={() => console.log("navegar para detalhes de", item.name)}
-        activeOpacity={0.85}
+        onPress={() => handleFavoritar(item.id)}
+        style={[styles.checkWrapper, isFavorito && styles.checkWrapperSelected]}
+        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
       >
-        <View style={styles.resultTextWrapper}>
-          <Text style={[styles.text, styles.local]}>{item.name}</Text>
-          {subtitle ? <Text style={[styles.text, styles.description]}>{subtitle}</Text> : null}
-        </View>
-
-        <TouchableOpacity
-          onPress={() => handleFavoritar(item.id)}
-          style={[styles.checkWrapper, isFavorito && styles.checkWrapperSelected]}
-          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-        >
-          <Text style={styles.checkIcon}>✓</Text>
-        </TouchableOpacity>
+        <Text style={styles.checkIcon}>✓</Text>
       </TouchableOpacity>
-    );
-  };
+    </TouchableOpacity>
+  );
+};
 
   return (
     <SafeAreaProvider>
@@ -61,7 +84,7 @@ export const SearchScreen = () => {
           <TextInput
             style={styles.searchInput}
             placeholder="Pesquisar cidade..."
-            placeholderTextColor="rgba(26, 25, 25, 0.6)"
+            placeholderTextColor="rgba(0, 0, 0, 0.6)"
             value={search}
             onChangeText={(text) => {
               setSearch(text);
