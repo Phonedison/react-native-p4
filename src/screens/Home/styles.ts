@@ -64,7 +64,7 @@ export const styles = StyleSheet.create({
 
   local: { fontWeight: "600", fontSize: 16 },
   description: { opacity: 0.9, fontWeight: "200", fontSize: 13 },
-  temperature: { fontWeight: "900", fontSize: 90 },
+  temperature: { fontWeight: "900", fontSize: 70 },
   subInfoText: { fontWeight: "600", fontSize: 16 },
   observation: { fontWeight: "400", fontSize: 13 },
 
