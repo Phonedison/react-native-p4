@@ -1,19 +1,21 @@
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FlatList, Image, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { Favorito, LocalFavorito } from "../../components/LocalFavorito";
 import { RootStackParamList } from "../../utils/routes";
 import { styles } from "./styles";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { openMeteoApi } from "../../services/API";
 
-const favoritos = [
-  { id: "1", longitude: "111", latitude: "111" },
-  { id: "2", longitude: "222", latitude: "222" },
-  { id: "3", longitude: "333", latitude: "333" },
-  { id: "4", longitude: "444", latitude: "444" },
-  { id: "5", longitude: "555", latitude: "555" },
-  { id: "6", longitude: "666", latitude: "666" },
+const locaisFavoritos = [
+  { id: "1", nomeCidade: "Rio de Janeiro, BR", latitude: "-22.9068", longitude: "-43.1729" },
+  { id: "2", nomeCidade: "São Paulo, BR", latitude: "-23.5505", longitude: "-46.6333" },
+  { id: "3", nomeCidade: "Porto Alegre, BR", latitude: "-30.0346", longitude: "-51.2177" },
+  { id: "4", nomeCidade: "Fortaleza, BR", latitude: "-3.7172",  longitude: "-38.5433" },
+  { id: "5", nomeCidade: "Paris, França", latitude: "48.8566",  longitude: "2.3522"   },
+  { id: "6", nomeCidade: "Tóquio, Japão", latitude: "35.6762",  longitude: "139.6503" },
 ];
 
 type SearchScreenNavigationProp = StackNavigationProp<
@@ -24,13 +26,53 @@ type SearchScreenNavigationProp = StackNavigationProp<
 export const HomeScreen = () => {
   const navigation = useNavigation<SearchScreenNavigationProp>();
   const [notificacao, setNotificacao] = useState(true);
-  const [favorito, setFavorito] = useState<Favorito[]>(favoritos);
+  const [favoritos, setFavoritos] = useState<Favorito[]>([]);
+  const [carregando, setCarregando] = useState(true);
 
-  function listarFavoritos() {}
+  useEffect(() => {
+    async function carregarFavoritosComClima(): Promise<void> {
+      try {
+        
+        const json = await AsyncStorage.getItem("@favoritos");
+        const dados: Favorito[] = json ? JSON.parse(json) : locaisFavoritos;
+
+        const favoritosComClima = await Promise.all(
+          dados.map(async (favorito): Promise<Favorito> => {
+            try {
+              const resposta = await openMeteoApi.get("/forecast", {
+                params: {
+                  latitude: favorito.latitude,
+                  longitude: favorito.longitude,
+                  current: "temperature_2m",
+                  forecast_days: 1,
+                },
+              });
+
+              const current = resposta.data?.current;
+              return {
+                ...favorito,
+                temperatura: current?.temperature_2m,
+              };
+            } catch {
+              return { ...favorito };
+            }
+          })
+        );
+
+        setFavoritos(favoritosComClima);
+      } catch (erro) {
+        console.error("Erro ao carregar favoritos:", erro);
+      } finally {
+        setCarregando(false);
+      }
+    }
+
+    carregarFavoritosComClima();
+  }, []);
 
   function removeFavorito(id: string) {
-    const novaListaFavorito = favorito.filter((favorito) => favorito.id != id);
-    setFavorito(novaListaFavorito);
+    const novaListaFavorito = favoritos.filter((favoritos) => favoritos.id != id);
+    setFavoritos(novaListaFavorito);
   }
 
   return (
@@ -73,7 +115,7 @@ export const HomeScreen = () => {
         </TouchableOpacity>
 
         <FlatList<Favorito>
-          data={favorito}
+          data={favoritos}
           keyExtractor={(local) => local.id}
           renderItem={({ item }) => (
             <LocalFavorito local={item} removeFavorito={removeFavorito} />
