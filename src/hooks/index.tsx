@@ -148,6 +148,21 @@ export const useBuscarClima = () => {
       setLoading(false);
     }
   };
+
+ const buscarTemperatura = async (latitude: number, longitude: number): Promise<number | null> => {
+  try {
+    const response = await openMeteoApi.get<any>("/forecast", {
+      params: {
+        latitude,
+        longitude,
+        current: "temperature_2m", 
+      },
+    });
+    return response.data.current?.temperature_2m ?? null;
+  } catch {
+    return null;
+  }
+};
   
   const limparResultados = () => {
   setLocaisEncontrados([]);
@@ -161,7 +176,8 @@ export const useBuscarClima = () => {
     erro, // -> Mensagem de erro informando o local
     buscarCidade, // -> método para buscar cidade pelo nome
     buscarClimaPorCoodenadas, // buscarClimaPorCoodenadas(latitude, longitude)-> busca dados climaticos passando latitude e longitude
-    limparResultados // Método para limpar os resultados da tela de pesquisa quando o usuário excluir o que digitou
+    limparResultados, // Método para limpar os resultados da tela de pesquisa quando o usuário excluir o que digitou
+    buscarTemperatura // Método para buscar a temperatura especifica da cidade no momento sem precisar da coordenada
   };
 };
 
