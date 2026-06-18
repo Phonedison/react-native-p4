@@ -11,8 +11,8 @@ import {
   View,
 } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-import { RootStackParamList } from "../../../utils/routes";
 import { Favorito, LocalFavorito } from "../../components/LocalFavorito";
+import { RootStackParamList } from "../../components/Navigators/Stack";
 import { useBuscarClima, useMyLocation } from "../../hooks";
 import { styles } from "./styles";
 
@@ -62,8 +62,6 @@ type SearchScreenNavigationProp = StackNavigationProp<
 
 export const HomeScreen = () => {
   const navigation = useNavigation<SearchScreenNavigationProp>();
-  const [notificacao, setNotificacao] = useState(true);
-
   const [favoritos, setFavoritos] = useState<Favorito[]>(locaisFavoritos);
   const [cidadeGps, setCidadeGps] = useState<string | null>(null);
 
@@ -100,8 +98,7 @@ export const HomeScreen = () => {
         );
       }
 
-      setCidadeGps(nomeCidade); // Salva no estado local da tela
-
+      setCidadeGps(nomeCidade);
       buscarClimaPorCoodenadas(resultadoGps.latitude, resultadoGps.longitude);
     }
   };
@@ -127,7 +124,7 @@ export const HomeScreen = () => {
 
   if (milimetrosChuva > 0) {
     statusClima = "Chuvoso";
-    iconStatusClima = "https://maps.gstatic.com/weather/v1/rain.png";
+    iconStatusClima = "https://maps.gstatic.com/weather/v1/mostly_cloudy.png";
   } else if (coberturaNuvens > 70) {
     statusClima = "Nublado";
     iconStatusClima = "https://maps.gstatic.com/weather/v1/cloudy.png";
@@ -233,7 +230,6 @@ export const HomeScreen = () => {
           )}
         </TouchableOpacity>
 
-        {/* Lista de Favoritos */}
         <FlatList<Favorito>
           data={favoritos}
           keyExtractor={(local) => local.id}
