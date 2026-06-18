@@ -5,8 +5,8 @@ import React, { useEffect, useState } from "react";
 import { FlatList, Image, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { Favorito, LocalFavorito } from "../../components/LocalFavorito";
+import { RootStackParamList } from "../../components/Navigators/Stack";
 import { openMeteoApi } from "../../services/API";
-import { RootStackParamList } from "../../utils/routes";
 import { styles } from "./styles";
 
 const locaisFavoritos = [
