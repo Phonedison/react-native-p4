@@ -6,7 +6,11 @@ import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { styles } from "./styles";
 import { useBuscarClima } from "../../hooks";
-import {RootStackParamList} from "../../utils/routes"
+import { RootStackParamList } from "../../components/Navigators/Stack";
+import { SearchInput } from "../../components/SearchInput";
+import { EmptyState } from "../../components/EmptyState";
+import { CityResultItem } from "../../components/CityResultItem";
+
 
 type NavigationProp = StackNavigationProp<RootStackParamList, "SearchPage">;
 
@@ -18,7 +22,6 @@ export const SearchScreen = () => {
 
   const { locaisEncontrados, loading, buscarCidade, limparResultados, buscarTemperatura } = useBuscarClima();
   
-
   useEffect(() => {
   if (locaisEncontrados.length === 0) {
     setTemperaturas({});
@@ -40,77 +43,38 @@ export const SearchScreen = () => {
     });
   };
 
-  const renderItem = ({ item }: { item: any }) => {
-  const isFavorito = favoritos.has(item.id);
-  const subtitle = [item.admin1, item.country].filter(Boolean).join(", ");
-  const temperatura = temperaturas[item.id];
-
-  return (
-    <TouchableOpacity
-      style={[styles.resultItem, isFavorito && styles.resultItemSelected]}
-      onPress={() => console.log("navegar para detalhes de", item.name)}
-      activeOpacity={0.85}
-    >
-      <View style={styles.resultTextWrapper}>
-      
-        <Text style={[styles.text, styles.local]}>{item.name} / <Text style={[styles.text, styles.subInfoText]}>
-        {temperatura !== undefined && temperatura !== null
-          ? `${(temperatura)}°`
-          : "..."}
-        </Text> </Text> 
-        {subtitle ? <Text style={[styles.text, styles.description]}>{subtitle}</Text> : null}
-
-      </View>
-        
-      <TouchableOpacity
-        onPress={() => handleFavoritar(item.id)}
-        style={[styles.checkWrapper, isFavorito && styles.checkWrapperSelected]}
-        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-      >
-        <Text style={styles.checkIcon}>✓</Text>
-      </TouchableOpacity>
-    </TouchableOpacity>
-  );
-};
-
+  const renderItem = ({ item }: { item: any }) => (
+  <CityResultItem
+    item={item}
+    isFavorito={favoritos.has(item.id)}
+    temperatura={temperaturas[item.id]}
+    onPress={() => console.log("navegar para detalhes de", item.name)}
+    onFavoritar={() => handleFavoritar(item.id)}
+  />
+);
 return (
   <SafeAreaProvider>
     <SafeAreaView style={styles.container} edges={["left", "right", "top"]}>
-      <View style={styles.searchWrapper}>
-
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Pesquisar cidade..."
-          placeholderTextColor="rgba(0, 0, 0, 0.6)"
-          value={search}
-          onChangeText={(text) => {
-            setSearch(text);
-            if (text.trim().length >= 3) {
-              buscarCidade(text);
-            } else {
-              limparResultados();
-            }
-          }}
+      <SearchInput
+         value={search}
+         onSearch={(text) => { setSearch(text); buscarCidade(text); }}
+         onClear={(text) => { setSearch(text); limparResultados(); }} 
         />
-      </View>
-        
-     {loading && (
+    {loading && (
       <ActivityIndicator size="large" color="#fff" style={{ marginTop: 20 }} />
       )}
 
     <FlatList
-        data={locaisEncontrados}
-        keyExtractor={(item) => String(item.id)}
-        renderItem={renderItem}
-        keyboardShouldPersistTaps="handled"
-        showsVerticalScrollIndicator={false}
-        style={{ width: "100%" }}
-        ListEmptyComponent={
-          search.trim().length >= 3 && !loading
-            ? <Text style={styles.emptyText}>Nenhuma cidade encontrada.</Text>
-            : null
-        }
-      />
+       data={locaisEncontrados}
+       keyExtractor={(item) => String(item.id)}
+       renderItem={renderItem}
+       keyboardShouldPersistTaps="handled"
+       showsVerticalScrollIndicator={false}
+       style={{ width: "100%" }}
+       ListEmptyComponent={
+    <EmptyState visible={search.trim().length >= 3 && !loading} />
+     }
+    />
     </SafeAreaView>
   </SafeAreaProvider>
 );
