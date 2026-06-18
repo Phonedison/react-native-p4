@@ -148,7 +148,12 @@ export const useBuscarClima = () => {
       setLoading(false);
     }
   };
-
+  
+  const limparResultados = () => {
+  setLocaisEncontrados([]);
+  setErro(null);
+  };
+  
   return {
     locaisEncontrados, // -> lista de locais após a busca da cidade pelo nome
     dadosClima, // -> objeto com todos os dados meteorológicos da cidade selecionada
@@ -156,6 +161,7 @@ export const useBuscarClima = () => {
     erro, // -> Mensagem de erro informando o local
     buscarCidade, // -> método para buscar cidade pelo nome
     buscarClimaPorCoodenadas, // buscarClimaPorCoodenadas(latitude, longitude)-> busca dados climaticos passando latitude e longitude
+    limparResultados // Método para limpar os resultados da tela de pesquisa quando o usuário excluir o que digitou
   };
 };
 
