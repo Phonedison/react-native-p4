@@ -2,7 +2,11 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Image } from "react-native";
 import { HomeScreen } from "../../../screens/Home";
 import { MembersScreen } from "../../../screens/Members";
-import { whiteColor } from "../../../utils/globalStyles";
+import {
+  backgroundColorNavegation,
+  colorNavegationInactive,
+  whiteColor,
+} from "../../../utils/globalStyles";
 
 export type TabParamList = {
   HomeTab: undefined;
@@ -22,7 +26,7 @@ export const TabRoutes = () => {
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
-          backgroundColor: "#013A63",
+          backgroundColor: backgroundColorNavegation,
           height: 65,
           borderTopWidth: 0,
         },
@@ -35,7 +39,7 @@ export const TabRoutes = () => {
           fontSize: 12,
         },
         tabBarActiveTintColor: whiteColor,
-        tabBarInactiveTintColor: "#ffffffb0",
+        tabBarInactiveTintColor: colorNavegationInactive,
       }}
     >
       <Tab.Screen
@@ -50,7 +54,7 @@ export const TabRoutes = () => {
                 width: size,
                 height: size,
                 resizeMode: "contain",
-                tintColor: focused ? whiteColor : "#ffffffb0",
+                tintColor: focused ? whiteColor : colorNavegationInactive,
               }}
             />
           ),
@@ -68,7 +72,7 @@ export const TabRoutes = () => {
                 width: size,
                 height: size,
                 resizeMode: "contain",
-                tintColor: focused ? whiteColor : "#ffffffb0",
+                tintColor: focused ? whiteColor : colorNavegationInactive,
               }}
             />
           ),
