@@ -108,19 +108,22 @@ export const SearchScreen = () => {
         <SearchInput
           value={search}
           onSearch={(text) => {
-            setSearch(text);
-
-            if (text.trim().length >= 3) {
-              buscarCidade(text);
-            } else {
-              limparResultados();
-            }
-          }}
+          setSearch(text);
+          if (text.trim().length >= 3) {
+           buscarCidade(text);
+           } else {
+          limparResultados();
+          }
+         }}
           onClear={(text) => {
-            setSearch(text);
-            limparResultados();
-          }}
+          setSearch(text);
+         limparResultados();
+         }}
         />
+
+     {loading && (
+      <ActivityIndicator size="large" color="#fff" style={{ marginTop: 20 }} />
+     )}
 
         <FlatList
           data={locaisEncontrados}
