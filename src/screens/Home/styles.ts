@@ -80,7 +80,7 @@ export const styles = StyleSheet.create({
     backgroundColor: backgroundColorNavegation,
     width: "100%",
     borderRadius: 32,
-    paddingVertical: 18,
+    paddingVertical: 16,
     alignItems: "center",
   },
 });

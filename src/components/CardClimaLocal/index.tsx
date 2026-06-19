@@ -49,7 +49,7 @@ export function CardClimaLocal({
         <View style={styles.infoContainer}>
           <Text style={[styles.text, styles.temperature]}>
             {dadosClima?.hourly?.temperature_2m?.[0] !== undefined
-              ? `${Math.round(dadosClima.hourly.temperature_2m[0])}ºC`
+              ? `${Math.round(dadosClima.hourly.temperature_2m[0])}º`
               : "-- ºC"}
           </Text>
           <Image
