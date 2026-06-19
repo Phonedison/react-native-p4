@@ -3,13 +3,13 @@ import { RouteProp, useRoute } from "@react-navigation/native";
 import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import iconCloud from "../../../assets/icons/iconCloud.png";
-import type { HomeStackParamList } from "../../components/Navigators/HomeStack";
+import type { RootStackParamList } from "../../components/Navigators/Stack";
 import { styles } from "./styles";
 import { useEffect, useState } from "react";
 import { openMeteoApi } from "../../services/API";
 
 type ClimateRouteProp = RouteProp<
-  HomeStackParamList,
+  RootStackParamList,
   "WeatherDatailsPage"
 >;
 

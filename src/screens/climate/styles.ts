@@ -87,6 +87,7 @@ export const styles = StyleSheet.create({
 
   largeCardContent: {
     gap: 10,
+    alignItems: "center",
   },
 
   locationDatails: {
@@ -117,5 +118,7 @@ export const styles = StyleSheet.create({
     paddingVertical: 20,
     flexDirection: "column",
     gap: 10,
+    alignItems: "center",
+    justifyContent: "center",
   },
 });

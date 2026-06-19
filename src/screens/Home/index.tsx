@@ -15,13 +15,10 @@ import { styles } from "./styles";
 
 const locaisPadrao: Favorito[] = [];
 
-type SearchScreenNavigationProp = StackNavigationProp<
-  RootStackParamList,
-  "SearchPage"
->;
+type HomeNavigationProp = StackNavigationProp<RootStackParamList>;
 
 export const HomeScreen = () => {
-  const navigation = useNavigation<SearchScreenNavigationProp>();
+  const navigation = useNavigation<HomeNavigationProp>();
   const [favoritos, setFavoritos] = useState<Favorito[]>([]);
   const [cidadeGps, setCidadeGps] = useState<string | null>(null);
   const [carregandoStorage, setCarregandoStorage] = useState(false);
@@ -138,7 +135,15 @@ export const HomeScreen = () => {
         <TouchableOpacity
           style={[styles.card, styles.cardPrincipal]}
           activeOpacity={0.85}
-          onPress={handleGpsLoading}
+          onPress={() =>
+            navigation.navigate("WeatherDatailsPage", {
+              localId: 0,
+              nomeCidade: cidadeGps ?? "Minha Localização",
+              latitude: dadosClima!.latitude,
+              longitude: dadosClima!.longitude,
+              temperatura: dadosClima!.hourly?.temperature_2m?.[0],
+            })
+          }
           disabled={estaCarregandoGps}
         >
           <CardClimaLocal
@@ -158,7 +163,19 @@ export const HomeScreen = () => {
           data={favoritos}
           keyExtractor={(local) => local.id}
           renderItem={({ item }) => (
-            <LocalFavorito local={item} removeFavorito={removeFavorito} />
+            <LocalFavorito
+              local={item}
+              removeFavorito={removeFavorito}
+              onPress={(temperatura) =>
+                navigation.navigate("WeatherDatailsPage", {
+                  localId: Number(item.id),
+                  nomeCidade: item.nomeCidade,
+                  latitude: item.latitude,
+                  longitude: item.longitude,
+                  temperatura,
+                })
+              }
+            />
           )}
           ListEmptyComponent={
             !carregandoStorage && favoritos.length === 0 ? (
