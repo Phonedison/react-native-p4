@@ -1,6 +1,14 @@
 import { useEffect } from "react";
-import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
+import {
+  ActivityIndicator,
+  Image,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { useBuscarClimaCidade } from "../../hooks";
+import { calcularMetricasClima } from "../../utils/climaHelper";
+import { whiteColor } from "../../utils/globalStyles";
 import { styles } from "./styles";
 
 export type Favorito = {
@@ -23,10 +31,12 @@ export function LocalFavorito({ local, removeFavorito }: FavoritoProps) {
     buscarClimaLocal(Number(local.latitude), Number(local.longitude));
   }, [local.latitude, local.longitude]);
 
+  const clima = calcularMetricasClima(climaLocal);
+
   if (loading) {
     return (
-      <View style={[styles.card, { padding: 20, justifyContent: "center" }]}>
-        <ActivityIndicator size="small" color="#000" />
+      <View style={[styles.card, styles.loading]}>
+        <ActivityIndicator size="small" color={whiteColor} />
       </View>
     );
   }
@@ -37,9 +47,26 @@ export function LocalFavorito({ local, removeFavorito }: FavoritoProps) {
     <TouchableOpacity style={styles.card} activeOpacity={0.85}>
       <View style={styles.conteudo}>
         <Text style={styles.cidadeTexto}>{local.nomeCidade}</Text>
-        <Text style={styles.tempTexto}>
-          {climaLocal.hourly?.temperature_2m?.[0]} ºC
-        </Text>
+        <View
+          style={{
+            gap: 4,
+
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "flex-start",
+          }}
+        >
+          <Image
+            source={{ uri: clima.iconStatusClima }}
+            style={{ width: 24, height: 24, resizeMode: "contain" }}
+            resizeMode="contain"
+          />
+          <Text style={styles.tempTexto}>
+            {climaLocal.hourly?.temperature_2m?.[0] !== undefined
+              ? `${Math.round(climaLocal.hourly.temperature_2m[0])}º`
+              : "-- ºC"}
+          </Text>
+        </View>
       </View>
       <TouchableOpacity
         onPress={() => removeFavorito(local.id)}
