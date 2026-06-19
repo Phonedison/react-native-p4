@@ -1,33 +1,31 @@
 import { StyleSheet } from "react-native";
-
-const whiteColor: string = "#fff";
-
-const cardBorderColor: string = "rgba(217, 217, 217, 0.55)";
-const backgroundColor: string = "rgb(5, 102, 141)";
-
-const cardAlertBackgroundColor: string = "rgba(204, 88, 3,0.8)";
-const cardBackgroundColor: string = "rgba(217, 217, 217, 0.13)";
+import {
+  backgroundColor,
+  cardBackgroundColor,
+  cardBorderColor,
+  whiteColor,
+} from "../../utils/globalStyles";
 
 export const styles = StyleSheet.create({
   header: {
-  flexDirection: "row",
-  justifyContent: "space-between",
-  alignItems: "center",
-  width: "100%",
-  marginBottom: 16,
-},
-   backBtn: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    width: "100%",
+    marginBottom: 16,
+  },
+  backBtn: {
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
   },
   backArrow: {
-    color: "#fff",
+    color: whiteColor,
     fontSize: 22,
     fontWeight: "300",
   },
   backText: {
-    color: "#fff",
+    color: whiteColor,
     fontSize: 18,
     fontWeight: "600",
   },
@@ -38,25 +36,9 @@ export const styles = StyleSheet.create({
     gap: 16,
     paddingVertical: 32,
     paddingHorizontal: 16,
+    paddingTop: 80,
   },
 
-  notification: {
-    flexDirection: "row",
-    justifyContent: "flex-end",
-    alignItems: "center",
-    width: "100%",
-  },
-
-  iconeContainer: {
-    padding: 16,
-    backgroundColor: cardAlertBackgroundColor,
-    borderColor: "orange",
-    borderWidth: 2,
-    borderRadius: 16,
-    alignItems: "flex-end",
-  },
-
-  
   card: {
     backgroundColor: cardBackgroundColor,
     width: "100%",
@@ -80,21 +62,12 @@ export const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
 
- 
-
-  text: { letterSpacing: 0.3, textAlign: "center", color: whiteColor },
-
-  local: { fontWeight: "600", fontSize: 16 },
-  description: { opacity: 0.9, fontWeight: "200", fontSize: 13 },
   temperature: { fontWeight: "900", fontSize: 90 },
-  subInfoText: { fontWeight: "600", fontSize: 16 },
   observation: { fontWeight: "400", fontSize: 13 },
 
-  
   iconTemperature: { width: 80, height: 80 },
   iconSubInfo: { width: 30, height: 30 },
 
-  
   containerCard: {
     flexDirection: "column",
     justifyContent: "center",
@@ -108,39 +81,8 @@ export const styles = StyleSheet.create({
     flexDirection: "row",
     gap: 8,
   },
-  
-  searchWrapper: {
-    flexDirection: "row",
-    alignItems: "center",
-    borderRadius: 20,
-    paddingHorizontal: 14,
-    marginBottom: 16,
-    height: 46,
-    overflow: "hidden",
-    borderWidth: 1,
-    borderColor: "rgba(255, 255, 255, 0.34)",
-    
+  flatlist: {
+    width: "100%",
   },
-
-  searchInput: {
-     flex: 1,
-    color: "#fff",
-    fontSize: 15,
-  },
-
-  searchIcon: {
-    fontSize: 18,
-    opacity: 0.8,
-  },
-
-  emptyText: {
-    color: "rgba(255,255,255,0.6)",
-    textAlign: "center",
-    marginTop: 24,
-    fontSize: 14,
-  },
-
- 
-
-
+  loading: { marginTop: 20 },
 });

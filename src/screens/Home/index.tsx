@@ -1,167 +1,183 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useNavigation } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
-import React, { useEffect, useState } from "react";
-import { FlatList, Image, Text, TouchableOpacity, View } from "react-native";
+import * as Location from "expo-location";
+import React, { useCallback, useEffect, useState } from "react";
+import { FlatList, Text, TouchableOpacity } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
+
+import { CardClimaLocal } from "../../components/CardClimaLocal";
 import { Favorito, LocalFavorito } from "../../components/LocalFavorito";
-import type { HomeStackParamList } from "../../components/Navigators/HomeStack";
-import { openMeteoApi } from "../../services/API";
+import { RootStackParamList } from "../../components/Navigators/Stack";
+import { useBuscarClima, useMyLocation } from "../../hooks";
+import { calcularMetricasClima } from "../../utils/climaHelper";
 import { styles } from "./styles";
 
-const locaisFavoritos = [
-  {
-    id: "1",
-    nomeCidade: "Rio de Janeiro, BR",
-    latitude: "-22.9068",
-    longitude: "-43.1729",
-  },
-  {
-    id: "2",
-    nomeCidade: "São Paulo, BR",
-    latitude: "-23.5505",
-    longitude: "-46.6333",
-  },
-  {
-    id: "3",
-    nomeCidade: "Porto Alegre, BR",
-    latitude: "-30.0346",
-    longitude: "-51.2177",
-  },
-  {
-    id: "4",
-    nomeCidade: "Fortaleza, BR",
-    latitude: "-3.7172",
-    longitude: "-38.5433",
-  },
-  {
-    id: "5",
-    nomeCidade: "Paris, França",
-    latitude: "48.8566",
-    longitude: "2.3522",
-  },
-  {
-    id: "6",
-    nomeCidade: "Tóquio, Japão",
-    latitude: "35.6762",
-    longitude: "139.6503",
-  },
-];
+const locaisPadrao: Favorito[] = [];
 
-type HomeNavigationProp = StackNavigationProp<HomeStackParamList>;
+type SearchScreenNavigationProp = StackNavigationProp<
+  RootStackParamList,
+  "SearchPage"
+>;
 
 export const HomeScreen = () => {
-  const navigation = useNavigation<HomeNavigationProp>();
+  const navigation = useNavigation<SearchScreenNavigationProp>();
   const [favoritos, setFavoritos] = useState<Favorito[]>([]);
+  const [cidadeGps, setCidadeGps] = useState<string | null>(null);
+  const [carregandoStorage, setCarregandoStorage] = useState(false);
 
-  useEffect(() => {
-    async function carregarFavoritosComClima(): Promise<void> {
-      try {
-        const json = await AsyncStorage.getItem("@favoritos");
-        const dados: Favorito[] = json ? JSON.parse(json) : locaisFavoritos;
+  const {
+    erro: erroGps,
+    loading: loadingGps,
+    getCoordenadas,
+  } = useMyLocation();
 
-        const favoritosComClima = await Promise.all(
-          dados.map(async (favorito): Promise<Favorito> => {
-            try {
-              const resposta = await openMeteoApi.get("/forecast", {
-                params: {
-                  latitude: favorito.latitude,
-                  longitude: favorito.longitude,
-                  current: "temperature_2m",
-                  forecast_days: 1,
-                },
-              });
+  const {
+    buscarClimaPorCoodenadas,
+    dadosClima,
+    loading: loadingClima,
+  } = useBuscarClima();
 
-              return {
-                ...favorito,
-                temperatura: resposta.data?.current?.temperature_2m,
-              };
-            } catch {
-              return { ...favorito };
-            }
-          }),
-        );
+  const carregarFavoritos = async () => {
+    try {
+      const json = await AsyncStorage.getItem("@favoritos");
+      setCarregandoStorage(true);
 
-        setFavoritos(favoritosComClima);
-      } catch (erro) {
-        console.error("Erro ao carregar favoritos:", erro);
+      if (json) {
+        setFavoritos(JSON.parse(json));
+      } else {
+        await AsyncStorage.setItem("@favoritos", JSON.stringify(locaisPadrao));
+        setFavoritos(locaisPadrao);
       }
+    } catch (erro) {
+      console.error("Erro ao carregar favoritos do storage:", erro);
+    } finally {
+      setCarregandoStorage(false);
     }
+  };
 
-    carregarFavoritosComClima();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      carregarFavoritos();
+    }, []),
+  );
 
-  function removeFavorito(id: string) {
-    setFavoritos((listaAtual) =>
-      listaAtual.filter((favorito) => favorito.id !== id),
-    );
+  const handleGpsLoading = async () => {
+    const resultadoGps = await getCoordenadas();
+    if (
+      resultadoGps &&
+      resultadoGps.latitude &&
+      resultadoGps.longitude &&
+      !isNaN(resultadoGps.latitude) &&
+      !isNaN(resultadoGps.longitude)
+    ) {
+      let nomeCidade = "Minha Localização";
+      try {
+        const [endereco] = await Location.reverseGeocodeAsync({
+          latitude: resultadoGps.latitude,
+          longitude: resultadoGps.longitude,
+        });
+        if (endereco && (endereco.city || endereco.subregion)) {
+          nomeCidade =
+            endereco.city || endereco.subregion || "Minha Localização";
+        }
+      } catch (error) {
+        console.info(
+          "Não foi possível traduzir as coordenadas no nome da cidade:",
+          error,
+        );
+      }
+      setCidadeGps(nomeCidade);
+      buscarClimaPorCoodenadas(
+        resultadoGps.latitude,
+        resultadoGps.longitude,
+        nomeCidade,
+      );
+    } else {
+      console.warn(
+        "erro handleGpsLoading: Coordenadas do GPS retornando inválidas.",
+      );
+    }
+  };
+
+  const clima = calcularMetricasClima(dadosClima);
+  const estaCarregandoGps = loadingGps || loadingClima;
+
+  async function removeFavorito(id: string) {
+    try {
+      const novaListaFavorito = favoritos.filter((fav) => fav.id !== id);
+      setFavoritos(novaListaFavorito);
+      await AsyncStorage.setItem(
+        "@favoritos",
+        JSON.stringify(novaListaFavorito),
+      );
+    } catch (erro) {
+      console.error("Erro ao remover favorito do storage:", erro);
+    }
   }
+
+  //atualização da localização a cada 1 min
+  useEffect(() => {
+    AsyncStorage.removeItem("@favoritos");
+    handleGpsLoading();
+    const intervalo = setInterval(() => {
+      handleGpsLoading();
+      const now = new Date();
+      console.info(now.toLocaleTimeString());
+    }, 60000);
+
+    return () => clearInterval(intervalo);
+  }, []);
 
   return (
     <SafeAreaProvider>
-      <SafeAreaView style={styles.container} edges={["left", "right", "top"]}>
+      <SafeAreaView
+        style={styles.container}
+        edges={["left", "right", "top", "bottom"]}
+      >
         <TouchableOpacity
           style={[styles.card, styles.cardPrincipal]}
           activeOpacity={0.85}
-          onPress={() => navigation.navigate("SearchPage")}
+          onPress={handleGpsLoading}
+          disabled={estaCarregandoGps}
         >
-          <View style={styles.containerCard}>
-            <Text style={[styles.text, styles.description]}>
-              Minha Localização
-            </Text>
-            <Text style={[styles.text, styles.local]}>Rio de Janeiro</Text>
-
-            <View style={styles.infoContainer}>
-              <Text style={[styles.text, styles.temperature]}>20º</Text>
-              <Image
-                source={require("../../../assets/icons/iconCloud.png")}
-                style={styles.iconTemperature}
-                resizeMode="contain"
-              />
-            </View>
-
-            <View style={styles.infoContainer}>
-              <Text style={[styles.text, styles.subInfoText]}>Nublado</Text>
-              <Image
-                source={require("../../../assets/icons/moonCloud.png")}
-                style={styles.iconSubInfo}
-                resizeMode="contain"
-              />
-            </View>
-
-            <View style={styles.infoContainer}>
-              <Text style={[styles.text, styles.observation]}>
-                Dia 22ª - Noite 18ºC
-              </Text>
-            </View>
-          </View>
+          <CardClimaLocal
+            estaCarregando={estaCarregandoGps}
+            dadosClima={dadosClima}
+            cidadeGps={cidadeGps}
+            erroGps={erroGps}
+            statusClima={clima.statusClima}
+            iconStatusClima={clima.iconStatusClima}
+            tempMinima={clima.tempMinima}
+            tempMaxima={clima.tempMaxima}
+            sensacaoTermica={clima.sensacaoTermica}
+          />
         </TouchableOpacity>
 
         <FlatList<Favorito>
           data={favoritos}
           keyExtractor={(local) => local.id}
           renderItem={({ item }) => (
-            <LocalFavorito
-              local={item}
-              removeFavorito={removeFavorito}
-              onPress={() =>
-                navigation.navigate("WeatherDatailsPage", {
-                  localId: Number(item.id),
-                  nomeCidade: item.nomeCidade,
-                  latitude: Number(item.latitude),
-                  longitude: Number(item.longitude),
-                  temperatura: item.temperatura,
-                })
-              }
-            />
+            <LocalFavorito local={item} removeFavorito={removeFavorito} />
           )}
           ListEmptyComponent={
-            <Text style={[styles.local, styles.text]}>
-              Ainda não existem locais favoritos.
-            </Text>
+            !carregandoStorage && favoritos.length === 0 ? (
+              <Text style={[styles.local, styles.text, styles.textInfo]}>
+                Ainda não existem locais favoritos.
+              </Text>
+            ) : null
           }
-          contentContainerStyle={{ gap: 16, width: "100%" }}
+          style={styles.listEmpty}
+          contentContainerStyle={[styles.containerFlatList, { flexGrow: 1 }]}
         />
+
+        <TouchableOpacity
+          onPress={() => navigation.navigate("SearchPage")}
+          activeOpacity={0.85}
+          style={styles.buttonAdd}
+        >
+          <Text style={styles.text}>Adicionar Cidade</Text>
+        </TouchableOpacity>
       </SafeAreaView>
     </SafeAreaProvider>
   );

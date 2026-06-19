@@ -1,12 +1,12 @@
 import { StyleSheet } from "react-native";
-
-const whiteColor: string = "#fff";
-
-const cardBorderColor: string = "rgba(217, 217, 217, 0.55)";
-const backgroundColor: string = "rgb(5, 102, 141)";
-
-const cardAlertBackgroundColor: string = "rgba(204, 88, 3,0.8)";
-const cardBackgroundColor: string = "rgba(217, 217, 217, 0.13)";
+import {
+  backgroundColor,
+  backgroundColorNavegation,
+  cardAlertBackgroundColor,
+  cardBackgroundColor,
+  cardBorderColor,
+  whiteColor,
+} from "../../utils/globalStyles";
 
 export const styles = StyleSheet.create({
   container: {
@@ -15,6 +15,7 @@ export const styles = StyleSheet.create({
     backgroundColor: backgroundColor,
     gap: 16,
     paddingVertical: 32,
+    paddingBottom: 20,
     paddingHorizontal: 16,
   },
 
@@ -34,13 +35,10 @@ export const styles = StyleSheet.create({
     alignItems: "flex-end",
   },
 
-  /* estilização padrão dos cards */
   card: {
     backgroundColor: cardBackgroundColor,
     width: "100%",
-    height: "100%",
     alignItems: "center",
-    alignContent: "center",
     borderColor: cardBorderColor,
     borderRadius: 16,
     borderWidth: 1,
@@ -58,32 +56,32 @@ export const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
 
-  /* estilização dos texto */
-
-  text: { letterSpacing: 0.3, textAlign: "center", color: whiteColor },
-
-  local: { fontWeight: "600", fontSize: 16 },
-  description: { opacity: 0.9, fontWeight: "200", fontSize: 13 },
-  temperature: { fontWeight: "900", fontSize: 90 },
-  subInfoText: { fontWeight: "600", fontSize: 16 },
-  observation: { fontWeight: "400", fontSize: 13 },
-
-  /* imgs */
-  iconTemperature: { width: 80, height: 80 },
-  iconSubInfo: { width: 30, height: 30 },
-
-  /* estilização dos conntúdo no card principal */
-  containerCard: {
-    flexDirection: "column",
-    justifyContent: "center",
-    width: "100%",
+  text: {
+    letterSpacing: 0.3,
+    textAlign: "center",
+    color: whiteColor,
   },
 
-  infoContainer: {
+  local: {
+    fontWeight: "600",
+    fontSize: 16,
+  },
+
+  textInfo: { textAlign: "center", marginTop: 20 },
+  containerFlatList: {
+    gap: 16,
     width: "100%",
+    paddingBottom: 20,
+    paddingVertical: 16,
+    paddingHorizontal: 16,
+  },
+
+  buttonAdd: {
+    backgroundColor: backgroundColorNavegation,
+    width: "100%",
+    borderRadius: 32,
+    paddingVertical: 16,
     alignItems: "center",
-    justifyContent: "center",
-    flexDirection: "row",
-    gap: 8,
   },
+  listEmpty: { flex: 1 },
 });
