@@ -1,9 +1,5 @@
 import { StyleSheet } from "react-native";
-
-const whiteColor = "#fff";
-const cardBorderColor = "rgba(217, 217, 217, 0.55)";
-const backgroundColor = "rgb(5, 102, 141)";
-const cardBackgroundColor = "rgba(217, 217, 217, 0.13)";
+import { backgroundColor, cardBackgroundColor, cardBorderColor, whiteColor } from "../../utils/globalStyles";
 
 export const styles = StyleSheet.create({
   container: {
@@ -31,8 +27,8 @@ export const styles = StyleSheet.create({
   },
 
   weatherCard: {
-    height: 135,
-    paddingHorizontal: 10,
+    height: 240,
+    paddingHorizontal: 20,
     gap: 8,
     justifyContent: "center",
   },
@@ -53,6 +49,13 @@ export const styles = StyleSheet.create({
     width: 18,
     height: 14,
     resizeMode: "contain",
+  },
+
+  linha :{
+  flexDirection: "row",
+  alignItems: "center",
+  gap: 20,
+
   },
 
   temperature: {

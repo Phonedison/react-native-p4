@@ -7,6 +7,8 @@ import type { RootStackParamList } from "../../components/Navigators/Stack";
 import { styles } from "./styles";
 import { useEffect, useState } from "react";
 import { openMeteoApi } from "../../services/API";
+import { CardClimaLocal } from "../../components/CardClimaLocal";
+import { calcularMetricasClima } from "../../utils/climaHelper";
 
 type ClimateRouteProp = RouteProp<
   RootStackParamList,
@@ -24,6 +26,7 @@ type DadosPrevisao = {
   hourly: {
     time: string[];
     temperature_2m: number[];
+    apparent_temperature: number[];
     weather_code: number[];
     is_day: number[];
   };
@@ -55,6 +58,7 @@ export const Climate = () => {
   const [clima, setClima] = useState<DadosPrevisao | null>(null);
   const [nextDay, setNextDay] = useState<string[]>([]);
   const date = new Date();
+  const metricas = calcularMetricasClima(clima);
 
   useEffect(() => {
     const datas = []
@@ -82,6 +86,7 @@ export const Climate = () => {
 
             hourly: [
               "temperature_2m",
+              "apparent_temperature",
               "weather_code",
               "is_day",
             ].join(","),
@@ -104,27 +109,19 @@ export const Climate = () => {
     <SafeAreaView style={styles.container} edges={["top", "left", "right"]}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false} >
 
-        <View style={[styles.card, styles.weatherCard]}>
-          <View style={styles.locationRow}>
-            <Text style={styles.location}>{nomeCidade}</Text>
-            <Image source={iconCloud} style={styles.cloudIcon} />
-          </View>
-          <Text style={styles.temperature}>
-            {temperatura ?? "--"}
-            {"\u00b0"}
-          </Text>
-          <View style={styles.datails}>
-            <Text style={styles.color}>
-              🌡️ {clima?.current.apparent_temperature ?? "--"}°
-            </Text>
-            <Text style={styles.color}>
-              💧 {clima?.current.relative_humidity_2m ?? "--"}%
-            </Text>
-            <Text style={styles.color}>
-              💨 {clima?.current.wind_speed_10m ?? "--"} km/h
-            </Text>
-          </View>
-        </View>
+        <TouchableOpacity style={[styles.card, styles.weatherCard]}>
+          <CardClimaLocal
+            estaCarregando={!clima}
+            dadosClima={clima}
+            cidadeGps={nomeCidade}
+            erroGps={null}
+            statusClima={metricas.statusClima}
+            iconStatusClima={metricas.iconStatusClima}
+            tempMinima={metricas.tempMinima}
+            tempMaxima={metricas.tempMaxima}
+            sensacaoTermica={metricas.sensacaoTermica}
+          />
+        </TouchableOpacity>
 
 
         <View style={styles.column}>
