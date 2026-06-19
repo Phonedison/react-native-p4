@@ -1,18 +1,19 @@
-import { useNavigation, useFocusEffect } from "@react-navigation/native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import * as Location from "expo-location";
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { FlatList, Text, TouchableOpacity } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
+
 import { CardClimaLocal } from "../../components/CardClimaLocal";
 import { Favorito, LocalFavorito } from "../../components/LocalFavorito";
 import { RootStackParamList } from "../../components/Navigators/Stack";
 import { useBuscarClima, useMyLocation } from "../../hooks";
 import { calcularMetricasClima } from "../../utils/climaHelper";
 import { styles } from "./styles";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const locaisFavoritos = [{}];
+const locaisPadrao: Favorito[] = [];
 
 type SearchScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -21,8 +22,9 @@ type SearchScreenNavigationProp = StackNavigationProp<
 
 export const HomeScreen = () => {
   const navigation = useNavigation<SearchScreenNavigationProp>();
-  const [favoritos, setFavoritos] = useState<Favorito[]>(locaisFavoritos);
+  const [favoritos, setFavoritos] = useState<Favorito[]>([]);
   const [cidadeGps, setCidadeGps] = useState<string | null>(null);
+  const [carregandoStorage, setCarregandoStorage] = useState(true);
 
   const {
     erro: erroGps,
@@ -34,6 +36,30 @@ export const HomeScreen = () => {
     dadosClima,
     loading: loadingClima,
   } = useBuscarClima();
+
+  const carregarFavoritos = async () => {
+    try {
+      setCarregandoStorage(true);
+      const json = await AsyncStorage.getItem("@favoritos");
+
+      if (json) {
+        setFavoritos(JSON.parse(json));
+      } else {
+        await AsyncStorage.setItem("@favoritos", JSON.stringify(locaisPadrao));
+        setFavoritos(locaisPadrao);
+      }
+    } catch (erro) {
+      console.error("Erro ao carregar favoritos do storage:", erro);
+    } finally {
+      setCarregandoStorage(false);
+    }
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      carregarFavoritos();
+    }, []),
+  );
 
   const handleGpsLoading = async () => {
     const resultadoGps = await getCoordenadas();
@@ -61,13 +87,20 @@ export const HomeScreen = () => {
   };
 
   const clima = calcularMetricasClima(dadosClima);
+  const estaCarregandoGps = loadingGps || loadingClima;
 
-  function removeFavorito(id: string) {
-    const novaListaFavorito = favoritos.filter((fav) => fav.id !== id);
-    setFavoritos(novaListaFavorito);
+  async function removeFavorito(id: string) {
+    try {
+      const novaListaFavorito = favoritos.filter((fav) => fav.id !== id);
+      setFavoritos(novaListaFavorito);
+      await AsyncStorage.setItem(
+        "@favoritos",
+        JSON.stringify(novaListaFavorito),
+      );
+    } catch (erro) {
+      console.error("Erro ao remover favorito do storage:", erro);
+    }
   }
-
-  const estaCarregando = loadingGps || loadingClima;
 
   return (
     <SafeAreaProvider>
@@ -79,10 +112,10 @@ export const HomeScreen = () => {
           style={[styles.card, styles.cardPrincipal]}
           activeOpacity={0.85}
           onPress={handleGpsLoading}
-          disabled={estaCarregando}
+          disabled={estaCarregandoGps}
         >
           <CardClimaLocal
-            estaCarregando={estaCarregando}
+            estaCarregando={estaCarregandoGps}
             dadosClima={dadosClima}
             cidadeGps={cidadeGps}
             erroGps={erroGps}
@@ -96,12 +129,12 @@ export const HomeScreen = () => {
 
         <FlatList<Favorito>
           data={favoritos}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(local) => local.id}
           renderItem={({ item }) => (
             <LocalFavorito local={item} removeFavorito={removeFavorito} />
           )}
           ListEmptyComponent={
-            !carregando ? (
+            !carregandoStorage ? (
               <Text style={[styles.local, styles.text, styles.textInfo]}>
                 Ainda não existem locais favoritos.
               </Text>
