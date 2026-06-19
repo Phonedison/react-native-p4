@@ -202,6 +202,13 @@ export const useBuscarClimaCidade = () => {
   const [climaLocal, setClimaLocal] = useState<any>(null);
 
   const buscarClimaLocal = async (lat: number, lon: number) => {
+    //teste
+    if (lat === undefined || lon === undefined || isNaN(lat) || isNaN(lon)) {
+      console.warn(
+        `método buscarClimaLocal cancelado: Latitude ou Longitude inválidas: {lat: ${lat}, long: ${lon}}`,
+      );
+      return;
+    }
     setLoading(true);
     try {
       const response = await openMeteoApi.get("/forecast", {
@@ -226,7 +233,7 @@ export const useBuscarClimaCidade = () => {
             "dew_point_2m",
             "apparent_temperature",
             "weather_code",
-          ],
+          ].join(","),
 
           minutely_15: [
             "temperature_2m",
@@ -238,7 +245,7 @@ export const useBuscarClimaCidade = () => {
             "precipitation",
             "rain",
             "dew_point_2m",
-          ],
+          ].join(","),
         },
       });
       setClimaLocal(response.data);
@@ -284,8 +291,8 @@ export const useMyLocation = () => {
 
       return novasCoordenadas;
     } catch (err) {
-      console.log(err);
-      alert("erro, Não foi possí9vel obter a localização atual.");
+      console.warn("erro, Não foi possível obter a localização atual.");
+      console.error(err);
       setErro("Erro");
       return null;
     } finally {
