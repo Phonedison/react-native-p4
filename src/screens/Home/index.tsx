@@ -2,7 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import * as Location from "expo-location";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { FlatList, Text, TouchableOpacity } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 
@@ -24,13 +24,14 @@ export const HomeScreen = () => {
   const navigation = useNavigation<SearchScreenNavigationProp>();
   const [favoritos, setFavoritos] = useState<Favorito[]>([]);
   const [cidadeGps, setCidadeGps] = useState<string | null>(null);
-  const [carregandoStorage, setCarregandoStorage] = useState(true);
+  const [carregandoStorage, setCarregandoStorage] = useState(false);
 
   const {
     erro: erroGps,
     loading: loadingGps,
     getCoordenadas,
   } = useMyLocation();
+
   const {
     buscarClimaPorCoodenadas,
     dadosClima,
@@ -39,8 +40,8 @@ export const HomeScreen = () => {
 
   const carregarFavoritos = async () => {
     try {
-      setCarregandoStorage(true);
       const json = await AsyncStorage.getItem("@favoritos");
+      setCarregandoStorage(true);
 
       if (json) {
         setFavoritos(JSON.parse(json));
@@ -63,7 +64,13 @@ export const HomeScreen = () => {
 
   const handleGpsLoading = async () => {
     const resultadoGps = await getCoordenadas();
-    if (resultadoGps && resultadoGps.latitude && resultadoGps.longitude) {
+    if (
+      resultadoGps &&
+      resultadoGps.latitude &&
+      resultadoGps.longitude &&
+      !isNaN(resultadoGps.latitude) &&
+      !isNaN(resultadoGps.longitude)
+    ) {
       let nomeCidade = "Minha Localização";
       try {
         const [endereco] = await Location.reverseGeocodeAsync({
@@ -75,14 +82,21 @@ export const HomeScreen = () => {
             endereco.city || endereco.subregion || "Minha Localização";
         }
       } catch (error) {
-        console.log(
+        console.info(
           "Não foi possível traduzir as coordenadas no nome da cidade:",
           error,
         );
       }
-
       setCidadeGps(nomeCidade);
-      buscarClimaPorCoodenadas(resultadoGps.latitude, resultadoGps.longitude);
+      buscarClimaPorCoodenadas(
+        resultadoGps.latitude,
+        resultadoGps.longitude,
+        nomeCidade,
+      );
+    } else {
+      console.warn(
+        "erro handleGpsLoading: Coordenadas do GPS retornando inválidas.",
+      );
     }
   };
 
@@ -101,6 +115,19 @@ export const HomeScreen = () => {
       console.error("Erro ao remover favorito do storage:", erro);
     }
   }
+
+  //atualização da localização a cada 1 min
+  useEffect(() => {
+    AsyncStorage.removeItem("@favoritos");
+    handleGpsLoading();
+    const intervalo = setInterval(() => {
+      handleGpsLoading();
+      const now = new Date();
+      console.info(now.toLocaleTimeString());
+    }, 60000);
+
+    return () => clearInterval(intervalo);
+  }, []);
 
   return (
     <SafeAreaProvider>
@@ -134,13 +161,14 @@ export const HomeScreen = () => {
             <LocalFavorito local={item} removeFavorito={removeFavorito} />
           )}
           ListEmptyComponent={
-            !carregandoStorage ? (
+            !carregandoStorage && favoritos.length === 0 ? (
               <Text style={[styles.local, styles.text, styles.textInfo]}>
                 Ainda não existem locais favoritos.
               </Text>
             ) : null
           }
-          contentContainerStyle={styles.containerFlatList}
+          style={styles.listEmpty}
+          contentContainerStyle={[styles.containerFlatList, { flexGrow: 1 }]}
         />
 
         <TouchableOpacity
