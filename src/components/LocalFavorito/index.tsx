@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import {
   ActivityIndicator,
   Image,
@@ -47,20 +47,8 @@ export function LocalFavorito({ local, removeFavorito }: FavoritoProps) {
     <TouchableOpacity style={styles.card} activeOpacity={0.85}>
       <View style={styles.conteudo}>
         <Text style={styles.cidadeTexto}>{local.nomeCidade}</Text>
-        <View
-          style={{
-            gap: 4,
-
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "flex-start",
-          }}
-        >
-          <Image
-            source={{ uri: clima.iconStatusClima }}
-            style={{ width: 24, height: 24, resizeMode: "contain" }}
-            resizeMode="contain"
-          />
+        <View style={styles.containerInfo}>
+          <Image source={{ uri: clima.iconStatusClima }} style={styles.image} />
           <Text style={styles.tempTexto}>
             {climaLocal.hourly?.temperature_2m?.[0] !== undefined
               ? `${Math.round(climaLocal.hourly.temperature_2m[0])}º`
@@ -68,6 +56,7 @@ export function LocalFavorito({ local, removeFavorito }: FavoritoProps) {
           </Text>
         </View>
       </View>
+
       <TouchableOpacity
         onPress={() => removeFavorito(local.id)}
         activeOpacity={0.8}

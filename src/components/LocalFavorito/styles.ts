@@ -52,4 +52,15 @@ export const styles = StyleSheet.create({
     fontWeight: "800",
     textAlign: "center",
   },
+  containerInfo: {
+    gap: 4,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "flex-start",
+  },
+  image: {
+    width: 24,
+    height: 24,
+    resizeMode: "contain",
+  },
 });
