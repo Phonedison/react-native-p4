@@ -83,4 +83,5 @@ export const styles = StyleSheet.create({
     paddingVertical: 16,
     alignItems: "center",
   },
+  listEmpty: { flex: 1 },
 });

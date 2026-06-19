@@ -81,4 +81,8 @@ export const styles = StyleSheet.create({
     flexDirection: "row",
     gap: 8,
   },
+  flatlist: {
+    width: "100%",
+  },
+  loading: { marginTop: 20 },
 });
