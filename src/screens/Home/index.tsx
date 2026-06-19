@@ -1,4 +1,4 @@
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import * as Location from "expo-location";
 import React, { useState } from "react";
@@ -10,45 +10,9 @@ import { RootStackParamList } from "../../components/Navigators/Stack";
 import { useBuscarClima, useMyLocation } from "../../hooks";
 import { calcularMetricasClima } from "../../utils/climaHelper";
 import { styles } from "./styles";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const locaisFavoritos = [
-  {
-    id: "1",
-    nomeCidade: "Rio de Janeiro, BR",
-    latitude: "-22.9068",
-    longitude: "-43.1729",
-  },
-  {
-    id: "2",
-    nomeCidade: "São Paulo, BR",
-    latitude: "-23.5505",
-    longitude: "-46.6333",
-  },
-  {
-    id: "3",
-    nomeCidade: "Porto Alegre, BR",
-    latitude: "-30.0346",
-    longitude: "-51.2177",
-  },
-  {
-    id: "4",
-    nomeCidade: "Fortaleza, BR",
-    latitude: "-3.7172",
-    longitude: "-38.5433",
-  },
-  {
-    id: "5",
-    nomeCidade: "Paris, França",
-    latitude: "48.8566",
-    longitude: "2.3522",
-  },
-  {
-    id: "6",
-    nomeCidade: "Tóquio, Japão",
-    latitude: "35.6762",
-    longitude: "139.6503",
-  },
-];
+const locaisFavoritos = [{}];
 
 type SearchScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -132,14 +96,16 @@ export const HomeScreen = () => {
 
         <FlatList<Favorito>
           data={favoritos}
-          keyExtractor={(local) => local.id}
+          keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
             <LocalFavorito local={item} removeFavorito={removeFavorito} />
           )}
           ListEmptyComponent={
-            <Text style={[styles.local, styles.text, styles.textInfo]}>
-              Ainda não existem locais favoritos.
-            </Text>
+            !carregando ? (
+              <Text style={[styles.local, styles.text, styles.textInfo]}>
+                Ainda não existem locais favoritos.
+              </Text>
+            ) : null
           }
           contentContainerStyle={styles.containerFlatList}
         />

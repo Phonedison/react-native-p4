@@ -10,6 +10,7 @@ import {
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { styles } from "./styles";
 import { useBuscarClima } from "../../hooks";
 import { RootStackParamList } from "../../components/Navigators/Stack";
@@ -21,11 +22,20 @@ type NavigationProp = StackNavigationProp<RootStackParamList, "SearchPage">;
 
 export const SearchScreen = () => {
   const navigation = useNavigation<NavigationProp>();
+
   const [search, setSearch] = useState("");
   const [favoritos, setFavoritos] = useState<Set<number>>(new Set());
   const [temperaturas, setTemperaturas] = useState<
     Record<number, number | null>
   >({});
+
+  const {
+    locaisEncontrados,
+    loading,
+    buscarCidade,
+    limparResultados,
+    buscarTemperatura,
+  } = useBuscarClima();
 
   const {
     locaisEncontrados,
@@ -43,14 +53,50 @@ export const SearchScreen = () => {
 
     locaisEncontrados.forEach(async (cidade) => {
       const temp = await buscarTemperatura(cidade.latitude, cidade.longitude);
-      setTemperaturas((prev) => ({ ...prev, [cidade.id]: temp }));
+
+      setTemperaturas((prev) => ({
+        ...prev,
+        [cidade.id]: temp,
+      }));
     });
   }, [locaisEncontrados]);
 
-  const handleFavoritar = (id: number) => {
+  async function salvarFavorito(cidade: any) {
+    try {
+      const json = await AsyncStorage.getItem("@favoritos");
+
+      const favoritosSalvos = json ? JSON.parse(json) : [];
+
+      const jaExiste = favoritosSalvos.some(
+        (fav: any) => fav.id === String(cidade.id),
+      );
+
+      if (jaExiste) return;
+
+      favoritosSalvos.push({
+        id: String(cidade.id),
+        nomeCidade: `${cidade.name}, ${cidade.country}`,
+        latitude: String(cidade.latitude),
+        longitude: String(cidade.longitude),
+      });
+
+      await AsyncStorage.setItem("@favoritos", JSON.stringify(favoritosSalvos));
+    } catch (error) {
+      console.error("Erro ao salvar favorito:", error);
+    }
+  }
+
+  const handleFavoritar = async (cidade: any) => {
     setFavoritos((prev) => {
       const next = new Set(prev);
-      next.has(id) ? next.delete(id) : next.add(id);
+
+      if (next.has(cidade.id)) {
+        next.delete(cidade.id);
+      } else {
+        next.add(cidade.id);
+        salvarFavorito(cidade);
+      }
+
       return next;
     });
   };
