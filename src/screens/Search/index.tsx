@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from "react";
-import { TextInput, View, TouchableOpacity, Text, FlatList, ActivityIndicator } from "react-native";
+import { FlatList, ActivityIndicator } from "react-native";
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
