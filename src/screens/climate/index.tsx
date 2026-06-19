@@ -104,7 +104,7 @@ export const Climate = () => {
     <SafeAreaView style={styles.container} edges={["top", "left", "right"]}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false} >
 
-        <TouchableOpacity style={[styles.card, styles.weatherCard]}>
+        <View style={[styles.card, styles.weatherCard]}>
           <View style={styles.locationRow}>
             <Text style={styles.location}>{nomeCidade}</Text>
             <Image source={iconCloud} style={styles.cloudIcon} />
@@ -124,7 +124,7 @@ export const Climate = () => {
               💨 {clima?.current.wind_speed_10m ?? "--"} km/h
             </Text>
           </View>
-        </TouchableOpacity>
+        </View>
 
 
         <View style={styles.column}>
@@ -162,8 +162,8 @@ export const Climate = () => {
           </View>
 
           <View style={[styles.card, styles.CardDown]}>
-            {nextDay.map(day => (
-              <View style={[styles.card, styles.CardDay]}>
+            {nextDay.map((day, index) => (
+              <View key={`${day}-${index}`} style={[styles.card, styles.CardDay]}>
                 <View>
                   <Text style={styles.location}>{day}</Text>
                 </View>
