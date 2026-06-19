@@ -55,6 +55,7 @@ export type DadosClima = {
     relative_humidity_2m: number[]; // Umidade relativa do ar horária (%).
     dew_point_2m: number[]; // Ponto de orvalho horário (°C).
     apparent_temperature: number[]; // Sensação térmica horária (°C).
+    weather_code: number[];
   };
 };
 
@@ -128,6 +129,7 @@ export const useBuscarClima = () => {
         "relative_humidity_2m",
         "dew_point_2m",
         "apparent_temperature",
+        "weather_code",
       ].join(","),
 
       minutely_15: [
@@ -223,6 +225,7 @@ export const useBuscarClimaCidade = () => {
             "relative_humidity_2m",
             "dew_point_2m",
             "apparent_temperature",
+            "weather_code",
           ],
 
           minutely_15: [
