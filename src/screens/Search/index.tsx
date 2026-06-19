@@ -9,6 +9,7 @@ import { EmptyState } from "../../components/EmptyState";
 import { RootStackParamList } from "../../components/Navigators/Stack";
 import { SearchInput } from "../../components/SearchInput";
 import { useBuscarClima } from "../../hooks";
+import { whiteColor } from "../../utils/globalStyles";
 import { styles } from "./styles";
 
 type NavigationProp = StackNavigationProp<RootStackParamList, "SearchPage">;
@@ -150,14 +151,17 @@ export const SearchScreen = () => {
       item={item}
       isFavorito={favoritosIds.has(String(item.id))}
       temperatura={temperaturas[item.id]}
-      onPress={() => console.log("navegar para detalhes de", item.name)}
+      onPress={() => console.info("navegar para detalhes de", item.name)}
       onFavoritar={() => handleFavoritar(item)}
     />
   );
 
   return (
     <SafeAreaProvider>
-      <SafeAreaView style={styles.container} edges={["left", "right", "top"]}>
+      <SafeAreaView
+        style={styles.container}
+        edges={["left", "right", "top", "bottom"]}
+      >
         <SearchInput
           value={search}
           onSearch={(text) => {
@@ -173,8 +177,8 @@ export const SearchScreen = () => {
         {loading && (
           <ActivityIndicator
             size="large"
-            color="#fff"
-            style={{ marginTop: 20 }}
+            color={whiteColor}
+            style={styles.loading}
           />
         )}
 
@@ -184,7 +188,7 @@ export const SearchScreen = () => {
           renderItem={renderItem}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
-          style={{ width: "100%" }}
+          style={styles.flatlist}
           ListEmptyComponent={
             <EmptyState visible={search.trim().length >= 3 && !loading} />
           }
