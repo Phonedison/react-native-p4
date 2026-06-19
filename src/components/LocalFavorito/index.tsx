@@ -14,8 +14,8 @@ import { styles } from "./styles";
 export type Favorito = {
   id: string;
   nomeCidade: string;
-  longitude: string;
-  latitude: string;
+  longitude: number;
+  latitude: number;
   temperatura?: string;
 };
 
@@ -28,7 +28,14 @@ export function LocalFavorito({ local, removeFavorito }: FavoritoProps) {
   const { climaLocal, loading, buscarClimaLocal } = useBuscarClimaCidade();
 
   useEffect(() => {
-    buscarClimaLocal(Number(local.latitude), Number(local.longitude));
+    if (!!local.latitude && !!local.longitude) {
+      buscarClimaLocal(local.latitude, local.longitude);
+    } else {
+      console.warn(
+        `Favorito ignorado (${local.nomeCidade}): Latitude ou Longitude inválidas na base de dados.`,
+        { originalLat: local.latitude, originalLon: local.longitude },
+      );
+    }
   }, [local.latitude, local.longitude]);
 
   const clima = calcularMetricasClima(climaLocal);
