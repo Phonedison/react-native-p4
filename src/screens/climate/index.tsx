@@ -1,6 +1,7 @@
 import { RouteProp, useRoute } from "@react-navigation/native";
 import { ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { LinearGradient } from "expo-linear-gradient";
 import type { RootStackParamList } from "../../components/Navigators/Stack";
 import { styles } from "./styles";
 import { useEffect, useState } from "react";
@@ -37,70 +38,114 @@ type DadosPrevisao = {
   };
 };
 
+const getWeatherIcon = (code: number) => {
+  if (code === 0) return "☀️";
+  if (code === 1) return "🌤️";
+  if (code === 2) return "⛅";
+  if (code === 3) return "☁️";
+  if (code === 45 || code === 48) return "🌫️";
+  if ([51, 53, 55, 56, 57].includes(code)) return "🌧️";
+  if ([61, 63, 65, 66, 67, 80, 81, 82].includes(code)) return "🌧️";
+  if ([71, 73, 75, 77, 85, 86].includes(code)) return "❄️";
+  if ([95, 96, 99].includes(code)) return "⛈️";
+
+  return "☀️";
+};
+
 export const Climate = () => {
   const route = useRoute<ClimateRouteProp>();
-  const { localId, nomeCidade, latitude, longitude } = route.params;
 
-  const [clima, setClima] = useState<DadosPrevisao | null>(null);
+  const {
+    localId,
+    nomeCidade,
+    latitude,
+    longitude,
+  } = route.params;
+
+  const [clima, setClima] =
+    useState<DadosPrevisao | null>(null);
+
   const [nextDay, setNextDay] = useState<string[]>([]);
 
   const metricas = calcularMetricasClima(clima);
+
+  const dailyMins =
+    clima?.daily?.temperature_2m_min?.slice(0, 7) ?? [];
+
+  const dailyMaxs =
+    clima?.daily?.temperature_2m_max?.slice(0, 7) ?? [];
+
+  const weeklyMin =
+    dailyMins.length > 0 ? Math.min(...dailyMins) : 0;
+
+  const weeklyMax =
+    dailyMaxs.length > 0 ? Math.max(...dailyMaxs) : 100;
+
+  const weeklyRange =
+    weeklyMax - weeklyMin || 1;
 
   useEffect(() => {
     const datas: string[] = [];
     const dataAtual = new Date();
 
     for (let i = 0; i < 7; i++) {
-      let dateString = dataAtual.toLocaleDateString("pt-BR", {
-        weekday: "short",
-      });
+      let dateString =
+        dataAtual.toLocaleDateString("pt-BR", {
+          weekday: "short",
+        });
 
       dateString =
         dateString.substring(0, 1).toUpperCase() +
         dateString.substring(1).replace(".", "");
 
       datas.push(dateString);
-      dataAtual.setDate(dataAtual.getDate() + 1);
+
+      dataAtual.setDate(
+        dataAtual.getDate() + 1
+      );
     }
 
     setNextDay(datas);
 
     async function buscarClima() {
       try {
-        const resposta = await openMeteoApi.get("/forecast", {
-          params: {
-            latitude,
-            longitude,
+        const resposta =
+          await openMeteoApi.get("/forecast", {
+            params: {
+              latitude,
+              longitude,
 
-            current: [
-              "temperature_2m",
-              "apparent_temperature",
-              "relative_humidity_2m",
-              "wind_speed_10m",
-            ].join(","),
+              current: [
+                "temperature_2m",
+                "apparent_temperature",
+                "relative_humidity_2m",
+                "wind_speed_10m",
+              ].join(","),
 
-            hourly: [
-              "temperature_2m",
-              "apparent_temperature",
-              "weather_code",
-              "is_day",
-            ].join(","),
+              hourly: [
+                "temperature_2m",
+                "apparent_temperature",
+                "weather_code",
+                "is_day",
+              ].join(","),
 
-            daily: [
-              "temperature_2m_max",
-              "temperature_2m_min",
-              "weather_code",
-            ].join(","),
+              daily: [
+                "temperature_2m_max",
+                "temperature_2m_min",
+                "weather_code",
+              ].join(","),
 
-            forecast_days: 7,
-            timezone: "auto",
-          },
-        });
+              forecast_days: 7,
+              timezone: "auto",
+            },
+          });
 
         setClima(resposta.data);
-        console.log("DAILY:", resposta.data.daily);
       } catch (error) {
-        console.error("Erro ao buscar o clima:", error);
+        console.error(
+          "Erro ao buscar o clima:",
+          error
+        );
       }
     }
 
@@ -108,12 +153,20 @@ export const Climate = () => {
   }, [latitude, longitude]);
 
   return (
-    <SafeAreaView style={styles.container} edges={["top", "left", "right"]}>
+    <SafeAreaView
+      style={styles.container}
+      edges={["top", "left", "right"]}
+    >
       <ScrollView
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        <View style={[styles.card, styles.weatherCard]}>
+        <View
+          style={[
+            styles.card,
+            styles.weatherCard,
+          ]}
+        >
           <CardClimaLocal
             mostrarLocalizacao={localId === 0}
             estaCarregando={!clima}
@@ -121,45 +174,146 @@ export const Climate = () => {
             cidadeGps={nomeCidade}
             erroGps={null}
             statusClima={metricas.statusClima}
-            iconStatusClima={metricas.iconStatusClima}
+            iconStatusClima={
+              metricas.iconStatusClima
+            }
             tempMinima={metricas.tempMinima}
             tempMaxima={metricas.tempMaxima}
-            sensacaoTermica={metricas.sensacaoTermica}
+            sensacaoTermica={
+              metricas.sensacaoTermica
+            }
           />
         </View>
 
         <View style={styles.column}>
           <CardDatails clima={clima} />
 
-          <View style={[styles.card, styles.CardDown]}>
-            <Text style={[styles.locationDatails, styles.days]}>
+          <View
+            style={[
+              styles.card,
+              styles.CardDown,
+            ]}
+          >
+            <Text
+              style={[
+                styles.locationDatails,
+                styles.days,
+              ]}
+            >
               7 DIAS
             </Text>
 
-            {nextDay.map((day, index) => (
-              <View
-                key={`${day}-${index}`}
-                style={[
-                  styles.card,
-                  styles.CardDay,
-                  {
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                  },
-                ]}
-              >
-                <Text style={styles.location}>
-                  {index === 0 ? "Hoje" : day}
-                </Text>
+            {nextDay.map((day, index) => {
+              const min = Math.round(
+                clima?.daily
+                  ?.temperature_2m_min?.[index] ?? 0
+              );
 
-                <Text style={styles.locationDatails}>
-                  {clima?.daily?.temperature_2m_min?.[index] ?? "--"}°
-                  {" / "}
-                  {clima?.daily?.temperature_2m_max?.[index] ?? "--"}°
-                </Text>
-              </View>
-            ))}
+              const max = Math.round(
+                clima?.daily
+                  ?.temperature_2m_max?.[index] ?? 0
+              );
+
+              const weatherCode =
+                clima?.daily
+                  ?.weather_code?.[index] ?? 0;
+
+              const icon =
+                getWeatherIcon(weatherCode);
+
+              const leftOffset =
+                ((min - weeklyMin) /
+                  weeklyRange) *
+                100;
+
+              const barWidth =
+                ((max - min) /
+                  weeklyRange) *
+                100;
+
+              return (
+                <View
+                  key={`${day}-${index}`}
+                  style={[
+                    styles.card,
+                    styles.CardDay,
+                  ]}
+                >
+                  <View style={styles.dayCard}>
+                    <View
+                      style={styles.dayLeft}
+                    >
+                      <Text
+                        style={styles.dayName}
+                      >
+                        {index === 0
+                          ? "Hoje"
+                          : day}
+                      </Text>
+
+                      <Text
+                        style={styles.dayIcon}
+                      >
+                        {icon}
+                      </Text>
+                    </View>
+
+                    <View
+                      style={styles.dayRight}
+                    >
+                      <Text
+                        style={
+                          styles.dayTempMin
+                        }
+                      >
+                        {min}°
+                      </Text>
+
+                      <View
+                        style={styles.tempBar}
+                      >
+                        <LinearGradient
+                          colors={[
+                            "#4facfe",
+                            "#00f2fe",
+                            "#f6d365",
+                            "#fda085",
+                          ]}
+                          start={{
+                            x: 0,
+                            y: 0,
+                          }}
+                          end={{
+                            x: 1,
+                            y: 0,
+                          }}
+                          style={[
+                            styles.tempBarFill,
+                            {
+                              position:
+                                "absolute",
+                              left: `${leftOffset}%`,
+                              width: `${Math.max(
+                                barWidth,
+                                8
+                              )}%`,
+                            },
+                          ]}
+                        />
+                      </View>
+
+                      <Text
+                        style={
+                          styles.dayTempMax
+                        }
+                      >
+                        {max}°
+                      </Text>
+                    </View>
+                  </View>
+                </View>
+              );
+            })}
           </View>
         </View>
       </ScrollView>
