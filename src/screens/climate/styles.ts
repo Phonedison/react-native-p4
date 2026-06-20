@@ -132,7 +132,7 @@ export const styles = StyleSheet.create({
   },
 
   CardDay: {
-    minHeight: 75,
+    minHeight: 50,
     paddingVertical: 12,
   },
 
@@ -157,7 +157,8 @@ export const styles = StyleSheet.create({
   },
 
   dayIcon: {
-    fontSize: 22,
+    width: 28,
+    height: 28,
   },
 
   dayRight: {
@@ -169,7 +170,7 @@ export const styles = StyleSheet.create({
 
   dayTempMin: {
     color: "#7FB3FF",
-    fontSize: 14,
+    fontSize: 18,
     fontWeight: "700",
     width: 35,
     textAlign: "center",
@@ -177,7 +178,7 @@ export const styles = StyleSheet.create({
 
   dayTempMax: {
     color: "#FFB84D",
-    fontSize: 14,
+    fontSize: 17,
     fontWeight: "700",
     width: 35,
     textAlign: "center",
@@ -185,7 +186,7 @@ export const styles = StyleSheet.create({
 
   tempBar: {
     flex: 1,
-    height: 6,
+    height: 7,
     backgroundColor: "#303030",
     borderRadius: 999,
     overflow: "hidden",

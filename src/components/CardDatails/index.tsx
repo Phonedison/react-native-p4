@@ -1,6 +1,6 @@
 import { ActivityIndicator, Image, ScrollView, Text, View } from "react-native";
 import { styles } from "../../screens/climate/styles";
-import { calcularMetricasClima } from "../../utils/climaHelper";
+import { obterIconClima } from "../../utils/obterIconClima";
 
 type CardDatailsProps = {
   clima: {
@@ -11,16 +11,6 @@ type CardDatailsProps = {
     };
   } | null;
 };
-
-function obterIconClima(codigoClima: number) {
-  return calcularMetricasClima({
-    hourly: {
-      weather_code: [codigoClima],
-      temperature_2m: [],
-      apparent_temperature: [],
-    },
-  }).iconStatusClima;
-}
 
 export const CardDatails = ({ clima }: CardDatailsProps) => {
   return (

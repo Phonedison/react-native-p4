@@ -1,5 +1,5 @@
 import { RouteProp, useRoute } from "@react-navigation/native";
-import { ScrollView, Text, View } from "react-native";
+import { Image, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
 import type { RootStackParamList } from "../../components/Navigators/Stack";
@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { openMeteoApi } from "../../services/API";
 import { CardClimaLocal } from "../../components/CardClimaLocal";
 import { calcularMetricasClima } from "../../utils/climaHelper";
+import { obterIconClima } from "../../utils/obterIconClima";
 import CardDatails from "../../components/CardDatails";
 
 type ClimateRouteProp = RouteProp<
@@ -36,20 +37,6 @@ type DadosPrevisao = {
     temperature_2m_min: number[];
     weather_code: number[];
   };
-};
-
-const getWeatherIcon = (code: number) => {
-  if (code === 0) return "☀️";
-  if (code === 1) return "🌤️";
-  if (code === 2) return "⛅";
-  if (code === 3) return "☁️";
-  if (code === 45 || code === 48) return "🌫️";
-  if ([51, 53, 55, 56, 57].includes(code)) return "🌧️";
-  if ([61, 63, 65, 66, 67, 80, 81, 82].includes(code)) return "🌧️";
-  if ([71, 73, 75, 77, 85, 86].includes(code)) return "❄️";
-  if ([95, 96, 99].includes(code)) return "⛈️";
-
-  return "☀️";
 };
 
 export const Climate = () => {
@@ -153,20 +140,9 @@ export const Climate = () => {
   }, [latitude, longitude]);
 
   return (
-    <SafeAreaView
-      style={styles.container}
-      edges={["top", "left", "right"]}
-    >
-      <ScrollView
-        contentContainerStyle={styles.content}
-        showsVerticalScrollIndicator={false}
-      >
-        <View
-          style={[
-            styles.card,
-            styles.weatherCard,
-          ]}
-        >
+    <SafeAreaView style={styles.container} edges={["top", "left", "right"]} >
+      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+        <View style={[styles.card,styles.weatherCard]}>
           <CardClimaLocal
             mostrarLocalizacao={localId === 0}
             estaCarregando={!clima}
@@ -174,141 +150,57 @@ export const Climate = () => {
             cidadeGps={nomeCidade}
             erroGps={null}
             statusClima={metricas.statusClima}
-            iconStatusClima={
-              metricas.iconStatusClima
-            }
+            iconStatusClima={ metricas.iconStatusClima }
             tempMinima={metricas.tempMinima}
             tempMaxima={metricas.tempMaxima}
-            sensacaoTermica={
-              metricas.sensacaoTermica
-            }
-          />
+            sensacaoTermica={metricas.sensacaoTermica} />
         </View>
 
         <View style={styles.column}>
           <CardDatails clima={clima} />
 
-          <View
-            style={[
-              styles.card,
-              styles.CardDown,
-            ]}
-          >
-            <Text
-              style={[
-                styles.locationDatails,
-                styles.days,
-              ]}
-            >
-              7 DIAS
-            </Text>
+          <View style={[ styles.card, styles.CardDown]}>
+            <Text style={[styles.locationDatails, styles.days]}>7 DIAS</Text>
 
             {nextDay.map((day, index) => {
-              const min = Math.round(
-                clima?.daily
-                  ?.temperature_2m_min?.[index] ?? 0
-              );
+              const min = Math.round( clima?.daily ?.temperature_2m_min?.[index] ?? 0);
 
-              const max = Math.round(
-                clima?.daily
-                  ?.temperature_2m_max?.[index] ?? 0
-              );
+              const max = Math.round(clima?.daily ?.temperature_2m_max?.[index] ?? 0);
 
-              const weatherCode =
-                clima?.daily
-                  ?.weather_code?.[index] ?? 0;
+              const weatherCode = clima?.daily ?.weather_code?.[index] ?? 0;
 
-              const icon =
-                getWeatherIcon(weatherCode);
+              const icon = obterIconClima(weatherCode);
 
-              const leftOffset =
-                ((min - weeklyMin) /
-                  weeklyRange) *
-                100;
+              const leftOffset = ((min - weeklyMin) / weeklyRange) * 100;
 
-              const barWidth =
-                ((max - min) /
-                  weeklyRange) *
-                100;
+              const barWidth = ((max - min) / weeklyRange) * 100;
 
               return (
-                <View
-                  key={`${day}-${index}`}
-                  style={[
-                    styles.card,
-                    styles.CardDay,
-                  ]}
+                <View key={`${day}-${index}`} style={[ styles.card, styles.CardDay ]}
                 >
                   <View style={styles.dayCard}>
-                    <View
-                      style={styles.dayLeft}
-                    >
-                      <Text
-                        style={styles.dayName}
-                      >
-                        {index === 0
-                          ? "Hoje"
-                          : day}
-                      </Text>
+                    <View style={styles.dayLeft}>
+                      <Text style={styles.dayName}>{index === 0 ? "Hoje" : day}</Text>
 
-                      <Text
-                        style={styles.dayIcon}
-                      >
-                        {icon}
-                      </Text>
+                      <Image source={{ uri: icon }} style={styles.dayIcon} resizeMode="contain" />
                     </View>
 
-                    <View
-                      style={styles.dayRight}
-                    >
-                      <Text
-                        style={
-                          styles.dayTempMin
-                        }
-                      >
-                        {min}°
-                      </Text>
+                    <View style={styles.dayRight}>
+                      <Text style={styles.dayTempMin}> {min}°</Text>
 
-                      <View
-                        style={styles.tempBar}
-                      >
-                        <LinearGradient
-                          colors={[
+                      <View style={styles.tempBar}>
+                        <LinearGradient colors={[
                             "#4facfe",
                             "#00f2fe",
                             "#f6d365",
                             "#fda085",
-                          ]}
-                          start={{
-                            x: 0,
-                            y: 0,
-                          }}
-                          end={{
-                            x: 1,
-                            y: 0,
-                          }}
-                          style={[
-                            styles.tempBarFill,
-                            {
-                              position:
-                                "absolute",
-                              left: `${leftOffset}%`,
-                              width: `${Math.max(
-                                barWidth,
-                                8
-                              )}%`,
-                            },
-                          ]}
-                        />
+                          ]} start={{ x: 0, y: 0,}} end={{ x: 1, y: 0, }}
+                          style={[ styles.tempBarFill,{
+                            position:"absolute", left: `${leftOffset}%`, width: `${Math.max(barWidth, 8)}%`,}
+                            ,]} />
                       </View>
 
-                      <Text
-                        style={
-                          styles.dayTempMax
-                        }
-                      >
-                        {max}°
-                      </Text>
+                      <Text style={ styles.dayTempMax }>{max}°</Text>
                     </View>
                   </View>
                 </View>
