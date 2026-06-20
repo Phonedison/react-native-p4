@@ -28,7 +28,7 @@ export const SearchInput = ({
       <TextInput
         style={styles.searchInput}
         placeholder="Pesquisar cidade..."
-        placeholderTextColor="rgba(0, 0, 0, 0.6)"
+        placeholderTextColor="#ffffff62"
         value={value}
         onChangeText={handleChange}
       />
