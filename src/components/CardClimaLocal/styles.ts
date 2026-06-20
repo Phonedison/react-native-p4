@@ -48,4 +48,9 @@ export const styles = StyleSheet.create({
     width: 30,
     height: 30,
   },
+  loading: {
+    paddingVertical: 50,
+    justifyContent: "center",
+    alignItems: "center",
+  },
 });
