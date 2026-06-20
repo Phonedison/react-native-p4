@@ -1,36 +1,28 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import React, { useEffect, useState } from "react";
+import {View, FlatList, ActivityIndicator} from "react-native";
+import {SafeAreaView, SafeAreaProvider} from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
-import React, { useEffect, useState } from "react";
-import { ActivityIndicator, FlatList } from "react-native";
-import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-import { CityResultItem } from "../../components/CityResultItem";
-import { EmptyState } from "../../components/EmptyState";
+import { styles } from "./styles";
+import { useBuscarClima } from "../../hooks";
 import { RootStackParamList } from "../../components/Navigators/Stack";
 import { SearchInput } from "../../components/SearchInput";
-import { useBuscarClima } from "../../hooks";
-import { whiteColor } from "../../utils/globalStyles";
-import { styles } from "./styles";
+import { EmptyState } from "../../components/EmptyState";
+import { CityResultItem } from "../../components/CityResultItem";
+import { useFavoritos } from "../../contexts/FavoritosContext";
 
 type NavigationProp = StackNavigationProp<RootStackParamList, "SearchPage">;
-
-interface CidadeResultado {
-  id: number;
-  name: string;
-  country: string;
-  latitude: number;
-  longitude: number;
-}
 
 export const SearchScreen = () => {
   const navigation = useNavigation<NavigationProp>();
 
   const [search, setSearch] = useState("");
 
-  const [favoritosIds, setFavoritosIds] = useState<Set<string>>(new Set());
-  const [temperaturas, setTemperaturas] = useState<
-    Record<number, number | null>
-  >({});
+  const [temperaturas, setTemperaturas] = useState<Record<number, number | null>>({});
+
+  const {favoritos: favoritosContext, adicionarFavorito} = useFavoritos();
+
+  const favoritos = new Set(favoritosContext.map((item) => Number(item.id)));
 
   const {
     locaisEncontrados,
@@ -41,117 +33,34 @@ export const SearchScreen = () => {
   } = useBuscarClima();
 
   useEffect(() => {
-    const carregarFavoritosIniciais = async () => {
-      try {
-        const json = await AsyncStorage.getItem("@favoritos");
-        if (json) {
-          const favoritados = JSON.parse(json);
-
-          const idsSet = new Set<string>(
-            favoritados.map((fav: any) => String(fav.id)),
-          );
-          setFavoritosIds(idsSet);
-        }
-      } catch (error) {
-        console.error("Erro ao carregar favoritos iniciais:", error);
-      }
-    };
-
-    carregarFavoritosIniciais();
-  }, []);
-
-  useEffect(() => {
     if (locaisEncontrados.length === 0) {
       setTemperaturas({});
       return;
     }
 
-    const carregarTemperaturas = async () => {
-      locaisEncontrados.forEach(async (cidade: CidadeResultado) => {
-        try {
-          const temp = await buscarTemperatura(
-            cidade.latitude,
-            cidade.longitude,
-          );
-          setTemperaturas((prev) => ({
-            ...prev,
-            [cidade.id]: temp,
-          }));
-        } catch (err) {
-          console.error(
-            `Erro ao buscar temperatura da cidade ${cidade.id}:`,
-            err,
-          );
-        }
-      });
-    };
-
-    carregarTemperaturas();
-  }, [locaisEncontrados]);
-
-  async function salvarFavorito(cidade: CidadeResultado) {
-    try {
-      const json = await AsyncStorage.getItem("@favoritos");
-      const favoritosSalvos = json ? JSON.parse(json) : [];
-
-      const jaExiste = favoritosSalvos.some(
-        (fav: any) => String(fav.id) === String(cidade.id),
+    locaisEncontrados.forEach(async (cidade) => {
+      const temp = await buscarTemperatura(
+        cidade.latitude,
+        cidade.longitude
       );
 
-      if (jaExiste) return;
-
-      favoritosSalvos.push({
-        id: String(cidade.id),
-        nomeCidade: `${cidade.name}, ${cidade.country}`,
-        latitude: String(cidade.latitude),
-        longitude: String(cidade.longitude),
-      });
-
-      await AsyncStorage.setItem("@favoritos", JSON.stringify(favoritosSalvos));
-    } catch (error) {
-      console.error("Erro ao salvar favorito:", error);
-    }
-  }
-
-  async function removerFavoritoStorage(cidadeId: string) {
-    try {
-      const json = await AsyncStorage.getItem("@favoritos");
-      if (json) {
-        const favoritosSalvos = JSON.parse(json);
-        const novaLista = favoritosSalvos.filter(
-          (fav: any) => String(fav.id) !== cidadeId,
-        );
-        await AsyncStorage.setItem("@favoritos", JSON.stringify(novaLista));
-      }
-    } catch (error) {
-      console.error("Erro ao remover favorito:", error);
-    }
-  }
-
-  const handleFavoritar = async (cidade: CidadeResultado) => {
-    const idString = String(cidade.id);
-
-    setFavoritosIds((prev) => {
-      const next = new Set(prev);
-
-      if (next.has(idString)) {
-        next.delete(idString);
-        removerFavoritoStorage(idString);
-      } else {
-        next.add(idString);
-        salvarFavorito(cidade);
-      }
-
-      return next;
+      setTemperaturas((prev) => ({
+        ...prev,
+        [cidade.id]: temp,
+      }));
     });
-  };
+  }, [locaisEncontrados]);
 
-  const renderItem = ({ item }: { item: CidadeResultado }) => (
+  const handleFavoritar = async (cidade: any) => {await adicionarFavorito(cidade);};
+
+  const renderItem = ({ item }: { item: any }) => (
     <CityResultItem
       item={item}
-      isFavorito={favoritosIds.has(String(item.id))}
+      isFavorito={favoritos.has(item.id)}
       temperatura={temperaturas[item.id]}
-      onPress={() => console.info("navegar para detalhes de", item.name)}
+      onPress={() =>
+        console.log("navegar para detalhes de", item.name)
+      }
       onFavoritar={() => handleFavoritar(item)}
     />
   );
@@ -160,13 +69,18 @@ export const SearchScreen = () => {
     <SafeAreaProvider>
       <SafeAreaView
         style={styles.container}
-        edges={["left", "right", "top", "bottom"]}
+        edges={["left", "right", "top"]}
       >
         <SearchInput
           value={search}
           onSearch={(text) => {
             setSearch(text);
-            buscarCidade(text);
+
+            if (text.trim().length >= 3) {
+              buscarCidade(text);
+            } else {
+              limparResultados();
+            }
           }}
           onClear={(text) => {
             setSearch(text);
@@ -177,8 +91,8 @@ export const SearchScreen = () => {
         {loading && (
           <ActivityIndicator
             size="large"
-            color={whiteColor}
-            style={styles.loading}
+            color="#fff"
+            style={{ marginTop: 20 }}
           />
         )}
 
@@ -188,9 +102,14 @@ export const SearchScreen = () => {
           renderItem={renderItem}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
-          style={styles.flatlist}
+          style={{ width: "100%" }}
           ListEmptyComponent={
-            <EmptyState visible={search.trim().length >= 3 && !loading} />
+            <EmptyState
+              visible={
+                search.trim().length >= 3 &&
+                !loading
+              }
+            />
           }
         />
       </SafeAreaView>

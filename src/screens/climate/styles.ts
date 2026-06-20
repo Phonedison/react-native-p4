@@ -51,11 +51,10 @@ export const styles = StyleSheet.create({
     resizeMode: "contain",
   },
 
-  linha :{
-  flexDirection: "row",
-  alignItems: "center",
-  gap: 20,
-
+  linha: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 20,
   },
 
   temperature: {
@@ -96,15 +95,21 @@ export const styles = StyleSheet.create({
   locationDatails: {
     color: whiteColor,
     fontSize: 14,
-    fontWeight: "500",
+    fontWeight: "600",
   },
 
-  weatherEmoji: {
-  fontSize: 25,
-},
+  days: {
+    fontSize: 16,
+    paddingHorizontal: 10,
+  },
+
+  weatherIcon: {
+    width: 35,
+    height: 35,
+  },
 
   CardDay: {
-    height: 60,
+    height: 62,
   },
 
   CardDown: {

@@ -1,14 +1,13 @@
-import React from "react";
 import { RouteProp, useRoute } from "@react-navigation/native";
-import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import iconCloud from "../../../assets/icons/iconCloud.png";
 import type { RootStackParamList } from "../../components/Navigators/Stack";
 import { styles } from "./styles";
 import { useEffect, useState } from "react";
 import { openMeteoApi } from "../../services/API";
 import { CardClimaLocal } from "../../components/CardClimaLocal";
 import { calcularMetricasClima } from "../../utils/climaHelper";
+import CardDatails from "../../components/CardDatails";
 
 type ClimateRouteProp = RouteProp<
   RootStackParamList,
@@ -32,29 +31,9 @@ type DadosPrevisao = {
   };
 };
 
-function obterEmojiClima(codigo: number, dia: number) {
-  if (codigo === 0) return dia === 1 ? "☀️" : "🌙";
-  if ([1, 2].includes(codigo)) return dia === 1 ? "🌤️" : "☁️";
-  if (codigo === 3) return "☁️";
-  if ([45, 48].includes(codigo)) return "🌫️";
-  if ([51, 53, 55, 56, 57].includes(codigo)) return "🌦️";
-
-  if ([61, 63, 65, 66, 67, 80, 81, 82].includes(codigo)) {
-    return "🌧️";
-  }
-
-  if ([71, 73, 75, 77, 85, 86].includes(codigo)) {
-    return "🌨️";
-  }
-
-  if ([95, 96, 99].includes(codigo)) return "⛈️";
-
-  return "🌡️";
-}
-
 export const Climate = () => {
   const route = useRoute<ClimateRouteProp>();
-  const { nomeCidade, temperatura, latitude, longitude } = route.params;
+  const {localId, nomeCidade, latitude, longitude } = route.params;
   const [clima, setClima] = useState<DadosPrevisao | null>(null);
   const [nextDay, setNextDay] = useState<string[]>([]);
   const date = new Date();
@@ -109,8 +88,9 @@ export const Climate = () => {
     <SafeAreaView style={styles.container} edges={["top", "left", "right"]}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false} >
 
-        <TouchableOpacity style={[styles.card, styles.weatherCard]}>
+        <View style={[styles.card, styles.weatherCard]}>
           <CardClimaLocal
+            mostrarLocalizacao={localId === 0}
             estaCarregando={!clima}
             dadosClima={clima}
             cidadeGps={nomeCidade}
@@ -121,48 +101,18 @@ export const Climate = () => {
             tempMaxima={metricas.tempMaxima}
             sensacaoTermica={metricas.sensacaoTermica}
           />
-        </TouchableOpacity>
-
+        </View>
 
         <View style={styles.column}>
-          <View style={[styles.card, styles.largeCard]}>
-            <ScrollView
-              horizontal
-              nestedScrollEnabled
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.largeCardContent}
-            >
-              {clima?.hourly.time.map((horario, index) => (
-                <View style={styles.cardDatails} key={horario}>
-                  <Text style={styles.locationDatails}>
-                    {index === 0
-                      ? "Agora"
-                      : horario.slice(11, 16)}
-                  </Text>
 
-                  <Text style={styles.weatherEmoji}>
-                    {obterEmojiClima(
-                      clima.hourly.weather_code[index],
-                      clima.hourly.is_day[index]
-                    )}
-                  </Text>
-
-                  <Text style={styles.locationDatails}>
-                    {Math.round(
-                      clima.hourly.temperature_2m[index]
-                    )}
-                    °
-                  </Text>
-                </View>
-              ))}
-            </ScrollView>
-          </View>
+          <CardDatails clima={clima} />
 
           <View style={[styles.card, styles.CardDown]}>
+            <Text style={[styles.locationDatails, styles.days]}>7 DIAS</Text>
             {nextDay.map((day, index) => (
               <View key={`${day}-${index}`} style={[styles.card, styles.CardDay]}>
                 <View>
-                  <Text style={styles.location}>{day}</Text>
+                  <Text style={styles.location}> {index === 0 ? "Hoje" : day}</Text>
                 </View>
               </View>
             ))}
