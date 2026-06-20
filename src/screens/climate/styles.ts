@@ -113,12 +113,6 @@ export const styles = StyleSheet.create({
     height: 35,
   },
 
-  CardDay: {
-    minHeight: 100,
-    paddingVertical: 12,
-    gap: 12,
-  },
-
   CardDown: {
     gap: 15,
   },
@@ -137,81 +131,70 @@ export const styles = StyleSheet.create({
     justifyContent: "center",
   },
 
-  dayTop: {
+  CardDay: {
+    minHeight: 75,
+    paddingVertical: 12,
+  },
+
+  dayCard: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    width: "100%",
+  },
+
+  dayLeft: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
+    gap: 12,
+    width: 90,
+  },
+
+  dayName: {
+    color: whiteColor,
+    fontSize: 15,
+    fontWeight: "600",
+  },
+
+  dayIcon: {
+    fontSize: 22,
+  },
+
+  dayRight: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
     gap: 10,
   },
 
-  dayBottom: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    flexWrap: "wrap",
-    gap: 8,
-  },
-
-  dayTitle: {
-    color: whiteColor,
-    fontSize: 16,
+  dayTempMin: {
+    color: "#7FB3FF",
+    fontSize: 14,
     fontWeight: "700",
-  },
-
-  dayDate: {
-    color: "#A0A0A0",
-    fontSize: 12,
-    marginTop: 2,
-  },
-
-  weatherInfo: {
-    alignItems: "center",
-    gap: 4,
-  },
-
-  weatherEmoji: {
-    fontSize: 24,
-  },
-
-  rainText: {
-    color: whiteColor,
-    fontSize: 12,
-  },
-
-  tempMin: {
-    color: "#8AA4FF",
-    fontSize: 16,
-    fontWeight: "700",
-    width: 40,
+    width: 35,
     textAlign: "center",
   },
 
-  tempMax: {
-    color: "#FFB15A",
-    fontSize: 16,
+  dayTempMax: {
+    color: "#FFB84D",
+    fontSize: 14,
     fontWeight: "700",
-    width: 40,
+    width: 35,
     textAlign: "center",
   },
 
-  temperatureBar: {
+  tempBar: {
     flex: 1,
     height: 6,
-    backgroundColor: "#3A3A3A",
+    backgroundColor: "#303030",
     borderRadius: 999,
-    marginHorizontal: 8,
     overflow: "hidden",
   },
 
-  temperatureIndicator: {
-    width: "65%",
+  tempBarFill: {
+    width: "70%",
     height: "100%",
-    backgroundColor: "#F4C542",
+    backgroundColor: "#F5B942",
     borderRadius: 999,
-  },
-
-  extraInfo: {
-    color: whiteColor,
-    fontSize: 11,
-    fontWeight: "500",
   },
 });
