@@ -1,5 +1,10 @@
 import { StyleSheet } from "react-native";
-import { backgroundColor, cardBackgroundColor, cardBorderColor, whiteColor } from "../../utils/globalStyles";
+import {
+  backgroundColor,
+  cardBackgroundColor,
+  cardBorderColor,
+  whiteColor,
+} from "../../utils/globalStyles";
 
 export const styles = StyleSheet.create({
   container: {
@@ -109,7 +114,9 @@ export const styles = StyleSheet.create({
   },
 
   CardDay: {
-    height: 62,
+    minHeight: 100,
+    paddingVertical: 12,
+    gap: 12,
   },
 
   CardDown: {
@@ -128,5 +135,83 @@ export const styles = StyleSheet.create({
     gap: 10,
     alignItems: "center",
     justifyContent: "center",
+  },
+
+  dayTop: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 10,
+  },
+
+  dayBottom: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    flexWrap: "wrap",
+    gap: 8,
+  },
+
+  dayTitle: {
+    color: whiteColor,
+    fontSize: 16,
+    fontWeight: "700",
+  },
+
+  dayDate: {
+    color: "#A0A0A0",
+    fontSize: 12,
+    marginTop: 2,
+  },
+
+  weatherInfo: {
+    alignItems: "center",
+    gap: 4,
+  },
+
+  weatherEmoji: {
+    fontSize: 24,
+  },
+
+  rainText: {
+    color: whiteColor,
+    fontSize: 12,
+  },
+
+  tempMin: {
+    color: "#8AA4FF",
+    fontSize: 16,
+    fontWeight: "700",
+    width: 40,
+    textAlign: "center",
+  },
+
+  tempMax: {
+    color: "#FFB15A",
+    fontSize: 16,
+    fontWeight: "700",
+    width: 40,
+    textAlign: "center",
+  },
+
+  temperatureBar: {
+    flex: 1,
+    height: 6,
+    backgroundColor: "#3A3A3A",
+    borderRadius: 999,
+    marginHorizontal: 8,
+    overflow: "hidden",
+  },
+
+  temperatureIndicator: {
+    width: "65%",
+    height: "100%",
+    backgroundColor: "#F4C542",
+    borderRadius: 999,
+  },
+
+  extraInfo: {
+    color: whiteColor,
+    fontSize: 11,
+    fontWeight: "500",
   },
 });

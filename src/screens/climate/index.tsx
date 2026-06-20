@@ -29,25 +29,41 @@ type DadosPrevisao = {
     weather_code: number[];
     is_day: number[];
   };
+
+  daily: {
+    temperature_2m_max: number[];
+    temperature_2m_min: number[];
+    weather_code: number[];
+  };
 };
 
 export const Climate = () => {
   const route = useRoute<ClimateRouteProp>();
-  const {localId, nomeCidade, latitude, longitude } = route.params;
+  const { localId, nomeCidade, latitude, longitude } = route.params;
+
   const [clima, setClima] = useState<DadosPrevisao | null>(null);
   const [nextDay, setNextDay] = useState<string[]>([]);
-  const date = new Date();
+
   const metricas = calcularMetricasClima(clima);
 
   useEffect(() => {
-    const datas = []
+    const datas: string[] = [];
+    const dataAtual = new Date();
 
     for (let i = 0; i < 7; i++) {
-      let dateString = date.toLocaleDateString('pt-BR', { weekday: 'short' });
-      dateString = (dateString.substring(0, 1).toUpperCase() + dateString.substring(1).replace(".", ""))
-      date.setDate(date.getDate() + 1);
-      datas.push(dateString)
-    } setNextDay(datas)
+      let dateString = dataAtual.toLocaleDateString("pt-BR", {
+        weekday: "short",
+      });
+
+      dateString =
+        dateString.substring(0, 1).toUpperCase() +
+        dateString.substring(1).replace(".", "");
+
+      datas.push(dateString);
+      dataAtual.setDate(dataAtual.getDate() + 1);
+    }
+
+    setNextDay(datas);
 
     async function buscarClima() {
       try {
@@ -70,14 +86,21 @@ export const Climate = () => {
               "is_day",
             ].join(","),
 
-            forecast_hours: 12,
+            daily: [
+              "temperature_2m_max",
+              "temperature_2m_min",
+              "weather_code",
+            ].join(","),
+
+            forecast_days: 7,
             timezone: "auto",
           },
         });
 
         setClima(resposta.data);
-      } catch (erro) {
-        console.error("Erro ao buscar o clima:", erro);
+        console.log("DAILY:", resposta.data.daily);
+      } catch (error) {
+        console.error("Erro ao buscar o clima:", error);
       }
     }
 
@@ -86,8 +109,10 @@ export const Climate = () => {
 
   return (
     <SafeAreaView style={styles.container} edges={["top", "left", "right"]}>
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false} >
-
+      <ScrollView
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+      >
         <View style={[styles.card, styles.weatherCard]}>
           <CardClimaLocal
             mostrarLocalizacao={localId === 0}
@@ -104,20 +129,38 @@ export const Climate = () => {
         </View>
 
         <View style={styles.column}>
-
           <CardDatails clima={clima} />
 
           <View style={[styles.card, styles.CardDown]}>
-            <Text style={[styles.locationDatails, styles.days]}>7 DIAS</Text>
+            <Text style={[styles.locationDatails, styles.days]}>
+              7 DIAS
+            </Text>
+
             {nextDay.map((day, index) => (
-              <View key={`${day}-${index}`} style={[styles.card, styles.CardDay]}>
-                <View>
-                  <Text style={styles.location}> {index === 0 ? "Hoje" : day}</Text>
-                </View>
+              <View
+                key={`${day}-${index}`}
+                style={[
+                  styles.card,
+                  styles.CardDay,
+                  {
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                  },
+                ]}
+              >
+                <Text style={styles.location}>
+                  {index === 0 ? "Hoje" : day}
+                </Text>
+
+                <Text style={styles.locationDatails}>
+                  {clima?.daily?.temperature_2m_min?.[index] ?? "--"}°
+                  {" / "}
+                  {clima?.daily?.temperature_2m_max?.[index] ?? "--"}°
+                </Text>
               </View>
             ))}
           </View>
-
         </View>
       </ScrollView>
     </SafeAreaView>
