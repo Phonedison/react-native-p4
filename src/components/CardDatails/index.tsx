@@ -13,6 +13,17 @@ type CardDatailsProps = {
 };
 
 export const CardDatails = ({ clima }: CardDatailsProps) => {
+  const previsao24Horas = clima
+  ? clima.hourly.time
+      .map((horario, index) => ({
+        horario,
+        temperatura: clima.hourly.temperature_2m[index],
+        codigoClima: clima.hourly.weather_code[index],
+      }))
+      .filter(({ horario }) => new Date(horario) >= new Date())
+      .slice(0, 24)
+  : [];
+
   return (
     <View style={[styles.card, styles.largeCard]}>
       <ScrollView
@@ -27,20 +38,20 @@ export const CardDatails = ({ clima }: CardDatailsProps) => {
                 <ActivityIndicator color="#FFFFFF" />
               </View>
 
-            )) : clima.hourly.time.map((horario, index) => (
+            )) : previsao24Horas.map((item, index) => (
                 
-              <View style={styles.cardDatails} key={horario}>
+              <View style={styles.cardDatails} key={item.horario}>
                 <Text style={styles.locationDatails}>
-                  {index === 0 ? "Agora" : horario.slice(11, 16)}
+                  {index === 0 ? "Agora" : item.horario.slice(11, 16)}
                 </Text>
 
-                <Image source={{ uri: obterIconClima(clima.hourly.weather_code[index])}}
+                <Image source={{ uri: obterIconClima(item.codigoClima)}}
                   style={styles.weatherIcon}
                   resizeMode="contain"
                 />
 
                 <Text style={styles.locationDatails}>
-                  {Math.round(clima.hourly.temperature_2m[index])}°
+                  {Math.round(item.temperatura)}°
                 </Text>
               </View>
             ))}
