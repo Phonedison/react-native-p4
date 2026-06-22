@@ -70,8 +70,7 @@ export const calcularMetricasClima = (dadosClima: any): ClimaProcessado => {
     case 61:
     case 80:
       statusClima = "Chuva Fraca";
-      iconStatusClima =
-        "https://maps.gstatic.com/weather/v1/scattered_showers.svg";
+      iconStatusClima = "https://maps.gstatic.com/weather/v1/scattered_showers.png";
       break;
 
     case 63:
