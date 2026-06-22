@@ -22,9 +22,14 @@ export type Favorito = {
 type FavoritoProps = {
   local: Favorito;
   removeFavorito: (id: string) => void;
+  onPress: (temperatura?: number) => void;
 };
 
-export function LocalFavorito({ local, removeFavorito }: FavoritoProps) {
+export function LocalFavorito({
+  local,
+  removeFavorito,
+  onPress,
+}: FavoritoProps) {
   const { climaLocal, loading, buscarClimaLocal } = useBuscarClimaCidade();
 
   useEffect(() => {
@@ -51,7 +56,11 @@ export function LocalFavorito({ local, removeFavorito }: FavoritoProps) {
   if (!climaLocal) return null;
 
   return (
-    <TouchableOpacity style={styles.card} activeOpacity={0.85}>
+    <TouchableOpacity
+      style={styles.card}
+      activeOpacity={0.85}
+      onPress={() => onPress(climaLocal.hourly?.temperature_2m?.[0])}
+    >
       <View style={styles.conteudo}>
         <Text style={styles.cidadeTexto}>{local.nomeCidade}</Text>
         <View style={styles.containerInfo}>

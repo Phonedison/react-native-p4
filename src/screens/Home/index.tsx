@@ -100,7 +100,15 @@ export const HomeScreen = () => {const navigation = useNavigation<SearchScreenNa
         <TouchableOpacity
           style={[styles.card, styles.cardPrincipal]}
           activeOpacity={0.85}
-          onPress={handleGpsLoading}
+          onPress={() =>
+            navigation.navigate("WeatherDatailsPage", {
+              localId: 0,
+              nomeCidade: cidadeGps ?? "Minha Localização",
+              latitude: dadosClima!.latitude,
+              longitude: dadosClima!.longitude,
+              temperatura: dadosClima!.hourly?.temperature_2m?.[0],
+            })
+          }
           disabled={estaCarregandoGps}
         >
           <CardClimaLocal
@@ -123,6 +131,15 @@ export const HomeScreen = () => {const navigation = useNavigation<SearchScreenNa
             <LocalFavorito
               local={item}
               removeFavorito={removerFavorito}
+              onPress={(temperatura) =>
+                navigation.navigate("WeatherDatailsPage", {
+                  localId: Number(item.id),
+                  nomeCidade: item.nomeCidade,
+                  latitude: item.latitude,
+                  longitude: item.longitude,
+                  temperatura,
+                })
+              }
             />
           )}
           ListEmptyComponent={

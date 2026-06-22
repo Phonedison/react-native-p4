@@ -13,6 +13,7 @@ type CardClimaLocalProps = {
   tempMaxima: string | number;
   sensacaoTermica: string | number;
   erroGps: string | null;
+  mostrarLocalizacao?: boolean;
 };
 
 export function CardClimaLocal({
@@ -24,6 +25,7 @@ export function CardClimaLocal({
   tempMaxima,
   sensacaoTermica,
   erroGps,
+  mostrarLocalizacao = true,
 }: CardClimaLocalProps) {
   if (!dadosClima && !erroGps) {
     return (
@@ -35,7 +37,11 @@ export function CardClimaLocal({
 
   return (
     <View style={styles.containerCard}>
-      <Text style={[styles.text, styles.description]}>Minha Localização</Text>
+      {mostrarLocalizacao && (
+        <Text style={[styles.text, styles.description]}>
+          Minha Localização
+        </Text>
+      )}
       <Text style={[styles.text, styles.local]}>{cidadeGps}</Text>
 
       <View style={styles.infoContainer}>
