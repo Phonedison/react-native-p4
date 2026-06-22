@@ -15,6 +15,9 @@ type Props = {
   onFavoritar: () => void;
 };
 
+// Monta um card com nome + temperatura da cidade, subtítulo com estado/país, 
+// e um botão de favoritar com área de toque ampliada — 
+// tudo com aparência condicional (cores/estilos) baseada em se a cidade já é favorita ou não.
 export const CityResultItem = ({
   item,
   isFavorito,

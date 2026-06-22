@@ -31,7 +31,9 @@ export const SearchScreen = () => {
     limparResultados,
     buscarTemperatura,
   } = useBuscarClima();
+  
 
+  //Busca a temperatura de cada cidade encontrada na pesquisa, e atualiza a tela conforme recebe as respostas.
   useEffect(() => {
     if (locaisEncontrados.length === 0) {
       setTemperaturas({});
@@ -51,8 +53,12 @@ export const SearchScreen = () => {
     });
   }, [locaisEncontrados]);
 
-  const handleFavoritar = async (cidade: any) => {await adicionarFavorito(cidade);};
 
+  const handleFavoritar = async (cidade: any) => {await adicionarFavorito(cidade);};
+  
+  //Pega cada cidade da lista e monta o card visual (CityResultItem), 
+  // já informando se ela é favorita, sua temperatura atual, 
+  // e as ação (favoritar ou ver detalhes).
   const renderItem = ({ item }: { item: any }) => (
     <CityResultItem
       item={item}
@@ -70,8 +76,11 @@ export const SearchScreen = () => {
       <SafeAreaView
         style={styles.container}
         edges={["left", "right", "top"]}
-      >
-        <SearchInput
+      > 
+
+      {/* O campo de busca só consulta a API quando o texto tem conteúdo relevante (3 ou mais caracteres), 
+      evitando chamadas a cada letra digitada, e sempre limpa a lista quando o texto fica curto ou vazio */}
+      <SearchInput 
           value={search}
           onSearch={(text) => {
             setSearch(text);
@@ -87,16 +96,23 @@ export const SearchScreen = () => {
             limparResultados();
           }}
         />
-
-        {loading && (
-          <ActivityIndicator
+        
+        {/*//Enquanto o app está buscando os resultados da cidade digitada, aparece um simbolo branco girando na tela; 
+        // assim que a busca termina 
+        //(loading vira false), ele desaparece e a lista de resultados é exibida no lugar.*/}
+        {loading && ( 
+          <ActivityIndicator 
             size="large"
             color="#fff"
             style={{ marginTop: 20 }}
           />
         )}
-
-        <FlatList
+        
+        {/* A lista mostra os resultados da busca, permite tocar nos itens mesmo com o teclado aberto, e 
+        quando não tem nenhum resultado  só exibe a mensagem de "Nenhuma cidade encontrada" se 
+        o usuário realmente já fez uma busca válida 
+        e ela já terminou de carregar. */}
+        <FlatList 
           data={locaisEncontrados}
           keyExtractor={(item) => String(item.id)}
           renderItem={renderItem}

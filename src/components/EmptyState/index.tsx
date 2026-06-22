@@ -7,6 +7,8 @@ type Props = {
   visible: boolean;
 };
 
+// Componente reutilizável que mostra uma mensagem de "lista vazia" 
+// mas só quando a prop visible for true; caso contrário, não renderiza nada.
 export const EmptyState = ({
   message = "Nenhuma cidade encontrada.",
   visible,

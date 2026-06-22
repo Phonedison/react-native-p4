@@ -9,6 +9,9 @@ type Props = {
   minLength?: number;
 };
 
+// É um campo de busca  que decide, a cada digitação, se o texto 
+// já é longo o suficiente pra buscar (onSearch) ou se deve limpar os resultados (onClear), 
+// usando um limite configurável (minLength, com padrão de 3).  
 export const SearchInput = ({
   value,
   onSearch,
