@@ -12,7 +12,7 @@ Aplicativo mobile de previsão do tempo desenvolvido em **React Native** com **E
 
 ## 🛠️ Tecnologias
 
-- [React Native]  + [Expo]
+- [React Native] + [Expo]
 - [TypeScript]
 - [React Navigation] (Stack + Bottom Tabs)
 - [Axios] — consumo de APIs
@@ -88,7 +88,7 @@ npm run web       # Abre no navegador
 
 ## 🌐 APIs utilizadas
 
-O projeto consome a API gratuita [Open-Meteo](https://open-meteo.com/), sem necessidade de chave de API:
+O projeto consome a API gratuita [Open-Meteo], sem necessidade de chave de API:
 
 - **Geocoding API** (`geocoding-api.open-meteo.com`) — busca de cidades pelo nome
 - **Weather Forecast API** (`api.open-meteo.com`) — dados de previsão do tempo por coordenadas (temperatura, umidade, vento, chuva, etc.)
@@ -97,20 +97,22 @@ O projeto consome a API gratuita [Open-Meteo](https://open-meteo.com/), sem nece
 
 | Nome | GitHub |
 |---|---|
-| Igor Brian | [@Bryanxrt] |
-| João Vitor Clemente Ferreira | [@JClemente-web] |
-| João Pedro Motta | [@joaopedrobr3] |
-| Lucas Leal da Silva | [@Phonedison] |
-| Matheus | [@zMatheus77] |
-| Yan Martins de Oliveira | [@YanYMO] |
+| Igor Brian | [@Bryanxrt](https://github.com/Bryanxrt) |
+| João Vitor Clemente Ferreira | [@JClemente-web](https://github.com/JClemente-web) |
+| João Pedro Motta | [@joaopedrobr3](https://github.com/joaopedrobr3) |
+| Lucas Leal da Silva | [@Phonedison](https://github.com/Phonedison) |
+| Matheus | [@zMatheus77](https://github.com/zMatheus77) |
+| Yan Martins de Oliveira | [@YanYMO](https://github.com/YanYMO) |
 
-## 👥 Funções do grupo
+## 🧩 Funções do grupo
 
-Tela Principal e tudo envolvido | Lucas e Yan |
-Tela de Pesquisa e tudo envolvido | João Pedro e Matheus |
-Tela de detalhes e tudo envolvido | Igor e João Vitor |
-
+| Responsabilidade | Responsáveis |
+|---|---|
+| Tela Principal e tudo envolvido | Lucas e Yan |
+| Tela de Pesquisa e tudo envolvido | João Pedro e Matheus |
+| Tela de Detalhes e tudo envolvido | Igor e João Vitor |
 
 ## 📄 Licença
 
 Projeto acadêmico desenvolvido para fins de estudo no curso da **Serratec**.
+
